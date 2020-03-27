@@ -6,70 +6,81 @@
     <DataSource Name="a1telekom_prd_ar">
       <DataSourceReference>/a1telekom_prd_ar</DataSourceReference>
       <rd:SecurityType>None</rd:SecurityType>
-      <rd:DataSourceID>cf88f23e-f85e-469d-96f4-f7de663f3d42</rd:DataSourceID>
+      <rd:DataSourceID>5df9142a-c757-45fd-af19-77dcba98c49d</rd:DataSourceID>
     </DataSource>
   </DataSources>
   <DataSets>
     <DataSet Name="a1telekom_prd_ar">
       <Query>
         <DataSourceName>a1telekom_prd_ar</DataSourceName>
-        <QueryParameters>
-          <QueryParameter Name="@StartDate">
-            <Value>=Parameters!StartDate.Value</Value>
-          </QueryParameter>
-          <QueryParameter Name="@EndDate">
-            <Value>=Parameters!EndDate.Value</Value>
-          </QueryParameter>
-        </QueryParameters>
-        <CommandText>select 
-  CHG_INFRASTRUCTURE_CHANGE.Infrastructure_Change_ID,
-  CHG_CHANGE_TYPE.CHANGE_TYPE,
-  CHG_INFRASTRUCTURE_CHANGE.Description,
-  CHG_CHANGE_REQUEST_STATUS.CHANGE_REQUEST_STATUS,
-  CHG_CHANGE_PRIORITY.PRIORITY,
-  CHG_INFRASTRUCTURE_CHANGE.Submitter,
-  dbo.fn_adjusted_date(CHG_INFRASTRUCTURE_CHANGE.Submit_Date) as Submit_Date
-from 
+        <CommandText>SELECT
+  HPD_HELP_DESK.Incident_Number ,
+  HPD_HELP_DESK.Description,
+  HPD_HELP_DESK.Detailed_Decription,
+  HPD_STATUS.STATUS,
+  HPD_PRIORITY.priority,
+  dbo.fn_adjusted_date( HPD_HELP_DESK.Submit_Date) as Submit_Date,
+  HPD_HELP_DESK.Assigned_Group ,
+  HPD_HELP_DESK.Assignee ,
+  SLM_STATUS.SLM_Status ,
+   dbo.fn_adjusted_date(HPD_HELP_DESK.Required_Resolution_DateTime) as Required_ResolutionDate
+FROM
+hpd_help_desk 
+inner join hpd_status
+on HPD_HELP_DESK.Status = hpd_status.ENUMID
+inner join hpd_priority
+on HPD_HELP_DESK.Priority = hpd_priority.ENUMID
+left outer join SLM_STATUS
+on HPD_HELP_DESK.SLM_Status = SLM_STATUS.ENUMID
 
-CHG_INFRASTRUCTURE_CHANGE
-left outer join CHG_CHANGE_TYPE
-on CHG_INFRASTRUCTURE_CHANGE.Change_Type=CHG_CHANGE_TYPE.ENUMID
-left outer join CHG_CHANGE_REQUEST_STATUS
-on CHG_INFRASTRUCTURE_CHANGE.Change_Request_Status = CHG_CHANGE_REQUEST_STATUS.ENUMID
-left outer join CHG_CHANGE_PRIORITY
-on CHG_INFRASTRUCTURE_CHANGE.Priority = CHG_CHANGE_PRIORITY.ENUMID
+WHERE
+  (
+   dbo.fn_adjusted_date( HPD_HELP_DESK.Submit_Date)  BETWEEN  '01/01/2018 00:0:0'  AND  getdate()
+   AND
+   HPD_HELP_DESK.Assigned_Group   IN  ( 'Customer Service Desk_srb','CS_Technical Support_srb'  )
+  )
 
-where  dbo.fn_adjusted_date(CHG_INFRASTRUCTURE_CHANGE.Submit_Date) between @StartDate and  @EndDate
-
-order by CHG_INFRASTRUCTURE_CHANGE.Submit_Date</CommandText>
+  order by Submit_Date</CommandText>
       </Query>
       <Fields>
-        <Field Name="Infrastructure_Change_ID">
-          <DataField>Infrastructure_Change_ID</DataField>
-          <rd:TypeName>System.String</rd:TypeName>
-        </Field>
-        <Field Name="CHANGE_TYPE">
-          <DataField>CHANGE_TYPE</DataField>
+        <Field Name="Incident_Number">
+          <DataField>Incident_Number</DataField>
           <rd:TypeName>System.String</rd:TypeName>
         </Field>
         <Field Name="Description">
           <DataField>Description</DataField>
           <rd:TypeName>System.String</rd:TypeName>
         </Field>
-        <Field Name="CHANGE_REQUEST_STATUS">
-          <DataField>CHANGE_REQUEST_STATUS</DataField>
+        <Field Name="Detailed_Decription">
+          <DataField>Detailed_Decription</DataField>
           <rd:TypeName>System.String</rd:TypeName>
         </Field>
-        <Field Name="PRIORITY">
-          <DataField>PRIORITY</DataField>
+        <Field Name="STATUS">
+          <DataField>STATUS</DataField>
           <rd:TypeName>System.String</rd:TypeName>
         </Field>
-        <Field Name="Submitter">
-          <DataField>Submitter</DataField>
+        <Field Name="priority">
+          <DataField>priority</DataField>
           <rd:TypeName>System.String</rd:TypeName>
         </Field>
         <Field Name="Submit_Date">
           <DataField>Submit_Date</DataField>
+          <rd:TypeName>System.DateTime</rd:TypeName>
+        </Field>
+        <Field Name="Assigned_Group">
+          <DataField>Assigned_Group</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
+        <Field Name="Assignee">
+          <DataField>Assignee</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
+        <Field Name="SLM_Status">
+          <DataField>SLM_Status</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
+        <Field Name="Required_ResolutionDate">
+          <DataField>Required_ResolutionDate</DataField>
           <rd:TypeName>System.DateTime</rd:TypeName>
         </Field>
       </Fields>
@@ -83,13 +94,25 @@ order by CHG_INFRASTRUCTURE_CHANGE.Submit_Date</CommandText>
             <TablixBody>
               <TablixColumns>
                 <TablixColumn>
-                  <Width>39.605mm</Width>
+                  <Width>36.85333mm</Width>
+                </TablixColumn>
+                <TablixColumn>
+                  <Width>41.72167mm</Width>
+                </TablixColumn>
+                <TablixColumn>
+                  <Width>63.1mm</Width>
                 </TablixColumn>
                 <TablixColumn>
                   <Width>25mm</Width>
                 </TablixColumn>
                 <TablixColumn>
-                  <Width>109.03165mm</Width>
+                  <Width>25mm</Width>
+                </TablixColumn>
+                <TablixColumn>
+                  <Width>39.81667mm</Width>
+                </TablixColumn>
+                <TablixColumn>
+                  <Width>53.36333mm</Width>
                 </TablixColumn>
                 <TablixColumn>
                   <Width>25mm</Width>
@@ -98,10 +121,7 @@ order by CHG_INFRASTRUCTURE_CHANGE.Submit_Date</CommandText>
                   <Width>25mm</Width>
                 </TablixColumn>
                 <TablixColumn>
-                  <Width>60.98338mm</Width>
-                </TablixColumn>
-                <TablixColumn>
-                  <Width>44.04998mm</Width>
+                  <Width>65.4283mm</Width>
                 </TablixColumn>
               </TablixColumns>
               <TablixRows>
@@ -117,8 +137,7 @@ order by CHG_INFRASTRUCTURE_CHANGE.Submit_Date</CommandText>
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value>Change ID
-</Value>
+                                  <Value>Incident ID</Value>
                                   <Style>
                                     <FontWeight>Bold</FontWeight>
                                     <Color>White</Color>
@@ -131,45 +150,6 @@ order by CHG_INFRASTRUCTURE_CHANGE.Submit_Date</CommandText>
                             </Paragraph>
                           </Paragraphs>
                           <rd:DefaultName>Textbox1</rd:DefaultName>
-                          <Style>
-                            <Border>
-                              <Color>LightGrey</Color>
-                              <Style>Solid</Style>
-                            </Border>
-                            <BackgroundColor>#f86e00</BackgroundColor>
-                            <VerticalAlign>Middle</VerticalAlign>
-                            <PaddingLeft>2pt</PaddingLeft>
-                            <PaddingRight>2pt</PaddingRight>
-                            <PaddingTop>2pt</PaddingTop>
-                            <PaddingBottom>2pt</PaddingBottom>
-                          </Style>
-                        </Textbox>
-                      </CellContents>
-                    </TablixCell>
-                    <TablixCell>
-                      <CellContents>
-                        <Textbox Name="Textbox7">
-                          <CanGrow>true</CanGrow>
-                          <KeepTogether>true</KeepTogether>
-                          <Paragraphs>
-                            <Paragraph>
-                              <TextRuns>
-                                <TextRun>
-                                  <Value>Change Type
-</Value>
-                                  <Style>
-                                    <FontFamily>Arial</FontFamily>
-                                    <FontWeight>Bold</FontWeight>
-                                    <Color>White</Color>
-                                  </Style>
-                                </TextRun>
-                              </TextRuns>
-                              <Style>
-                                <TextAlign>Center</TextAlign>
-                              </Style>
-                            </Paragraph>
-                          </Paragraphs>
-                          <rd:DefaultName>Textbox7</rd:DefaultName>
                           <Style>
                             <Border>
                               <Color>LightGrey</Color>
@@ -231,7 +211,7 @@ order by CHG_INFRASTRUCTURE_CHANGE.Submit_Date</CommandText>
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value>Status</Value>
+                                  <Value>Notes</Value>
                                   <Style>
                                     <FontWeight>Bold</FontWeight>
                                     <Color>White</Color>
@@ -244,6 +224,44 @@ order by CHG_INFRASTRUCTURE_CHANGE.Submit_Date</CommandText>
                             </Paragraph>
                           </Paragraphs>
                           <rd:DefaultName>Textbox5</rd:DefaultName>
+                          <Style>
+                            <Border>
+                              <Color>LightGrey</Color>
+                              <Style>Solid</Style>
+                            </Border>
+                            <BackgroundColor>#f86e00</BackgroundColor>
+                            <VerticalAlign>Middle</VerticalAlign>
+                            <PaddingLeft>2pt</PaddingLeft>
+                            <PaddingRight>2pt</PaddingRight>
+                            <PaddingTop>2pt</PaddingTop>
+                            <PaddingBottom>2pt</PaddingBottom>
+                          </Style>
+                        </Textbox>
+                      </CellContents>
+                    </TablixCell>
+                    <TablixCell>
+                      <CellContents>
+                        <Textbox Name="Textbox7">
+                          <CanGrow>true</CanGrow>
+                          <KeepTogether>true</KeepTogether>
+                          <Paragraphs>
+                            <Paragraph>
+                              <TextRuns>
+                                <TextRun>
+                                  <Value>Status</Value>
+                                  <Style>
+                                    <FontFamily>Arial</FontFamily>
+                                    <FontWeight>Bold</FontWeight>
+                                    <Color>White</Color>
+                                  </Style>
+                                </TextRun>
+                              </TextRuns>
+                              <Style>
+                                <TextAlign>Center</TextAlign>
+                              </Style>
+                            </Paragraph>
+                          </Paragraphs>
+                          <rd:DefaultName>Textbox7</rd:DefaultName>
                           <Style>
                             <Border>
                               <Color>LightGrey</Color>
@@ -306,7 +324,7 @@ order by CHG_INFRASTRUCTURE_CHANGE.Submit_Date</CommandText>
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value>Submitter</Value>
+                                  <Value>Submit Date</Value>
                                   <Style>
                                     <FontFamily>Arial</FontFamily>
                                     <FontWeight>Bold</FontWeight>
@@ -344,8 +362,7 @@ order by CHG_INFRASTRUCTURE_CHANGE.Submit_Date</CommandText>
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value>Submit Date
-</Value>
+                                  <Value>Assigned Group</Value>
                                   <Style>
                                     <FontFamily>Arial</FontFamily>
                                     <FontWeight>Bold</FontWeight>
@@ -374,33 +391,36 @@ order by CHG_INFRASTRUCTURE_CHANGE.Submit_Date</CommandText>
                         </Textbox>
                       </CellContents>
                     </TablixCell>
-                  </TablixCells>
-                </TablixRow>
-                <TablixRow>
-                  <Height>6mm</Height>
-                  <TablixCells>
                     <TablixCell>
                       <CellContents>
-                        <Textbox Name="Infrastructure_Change_ID">
+                        <Textbox Name="Textbox15">
+                          <CanGrow>true</CanGrow>
                           <KeepTogether>true</KeepTogether>
                           <Paragraphs>
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value>=Fields!Infrastructure_Change_ID.Value</Value>
-                                  <Style />
+                                  <Value>Assignee</Value>
+                                  <Style>
+                                    <FontFamily>Arial</FontFamily>
+                                    <FontWeight>Bold</FontWeight>
+                                    <Color>White</Color>
+                                  </Style>
                                 </TextRun>
                               </TextRuns>
-                              <Style />
+                              <Style>
+                                <TextAlign>Center</TextAlign>
+                              </Style>
                             </Paragraph>
                           </Paragraphs>
-                          <rd:DefaultName>Infrastructure_Change_ID</rd:DefaultName>
+                          <rd:DefaultName>Textbox15</rd:DefaultName>
                           <Style>
                             <Border>
                               <Color>LightGrey</Color>
                               <Style>Solid</Style>
                             </Border>
-                            <BackgroundColor>=IIF(ROWNUMBER(NOTHING) MOD 2, "#FBE4D6", "Transparent")</BackgroundColor>
+                            <BackgroundColor>#f86e00</BackgroundColor>
+                            <VerticalAlign>Middle</VerticalAlign>
                             <PaddingLeft>2pt</PaddingLeft>
                             <PaddingRight>2pt</PaddingRight>
                             <PaddingTop>2pt</PaddingTop>
@@ -411,22 +431,102 @@ order by CHG_INFRASTRUCTURE_CHANGE.Submit_Date</CommandText>
                     </TablixCell>
                     <TablixCell>
                       <CellContents>
-                        <Textbox Name="CHANGE_TYPE">
+                        <Textbox Name="Textbox17">
+                          <CanGrow>true</CanGrow>
                           <KeepTogether>true</KeepTogether>
                           <Paragraphs>
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value>=Fields!CHANGE_TYPE.Value</Value>
+                                  <Value>SLM Status</Value>
                                   <Style>
                                     <FontFamily>Arial</FontFamily>
+                                    <FontWeight>Bold</FontWeight>
+                                    <Color>White</Color>
                                   </Style>
+                                </TextRun>
+                              </TextRuns>
+                              <Style>
+                                <TextAlign>Center</TextAlign>
+                              </Style>
+                            </Paragraph>
+                          </Paragraphs>
+                          <rd:DefaultName>Textbox17</rd:DefaultName>
+                          <Style>
+                            <Border>
+                              <Color>LightGrey</Color>
+                              <Style>Solid</Style>
+                            </Border>
+                            <BackgroundColor>#f86e00</BackgroundColor>
+                            <VerticalAlign>Middle</VerticalAlign>
+                            <PaddingLeft>2pt</PaddingLeft>
+                            <PaddingRight>2pt</PaddingRight>
+                            <PaddingTop>2pt</PaddingTop>
+                            <PaddingBottom>2pt</PaddingBottom>
+                          </Style>
+                        </Textbox>
+                      </CellContents>
+                    </TablixCell>
+                    <TablixCell>
+                      <CellContents>
+                        <Textbox Name="Textbox19">
+                          <CanGrow>true</CanGrow>
+                          <KeepTogether>true</KeepTogether>
+                          <Paragraphs>
+                            <Paragraph>
+                              <TextRuns>
+                                <TextRun>
+                                  <Value>Incident Required Resolution Date</Value>
+                                  <Style>
+                                    <FontFamily>Arial</FontFamily>
+                                    <FontWeight>Bold</FontWeight>
+                                    <Color>White</Color>
+                                  </Style>
+                                </TextRun>
+                              </TextRuns>
+                              <Style>
+                                <TextAlign>Center</TextAlign>
+                              </Style>
+                            </Paragraph>
+                          </Paragraphs>
+                          <rd:DefaultName>Textbox19</rd:DefaultName>
+                          <Style>
+                            <Border>
+                              <Color>LightGrey</Color>
+                              <Style>Solid</Style>
+                            </Border>
+                            <BackgroundColor>#f86e00</BackgroundColor>
+                            <VerticalAlign>Middle</VerticalAlign>
+                            <PaddingLeft>2pt</PaddingLeft>
+                            <PaddingRight>2pt</PaddingRight>
+                            <PaddingTop>2pt</PaddingTop>
+                            <PaddingBottom>2pt</PaddingBottom>
+                          </Style>
+                        </Textbox>
+                      </CellContents>
+                    </TablixCell>
+                  </TablixCells>
+                </TablixRow>
+                <TablixRow>
+                  <Height>6mm</Height>
+                  <TablixCells>
+                    <TablixCell>
+                      <CellContents>
+                        <Textbox Name="Incident_Number">
+                          <CanGrow>true</CanGrow>
+                          <KeepTogether>true</KeepTogether>
+                          <Paragraphs>
+                            <Paragraph>
+                              <TextRuns>
+                                <TextRun>
+                                  <Value>=Fields!Incident_Number.Value</Value>
+                                  <Style />
                                 </TextRun>
                               </TextRuns>
                               <Style />
                             </Paragraph>
                           </Paragraphs>
-                          <rd:DefaultName>CHANGE_TYPE</rd:DefaultName>
+                          <rd:DefaultName>Incident_Number</rd:DefaultName>
                           <Style>
                             <Border>
                               <Color>LightGrey</Color>
@@ -444,6 +544,7 @@ order by CHG_INFRASTRUCTURE_CHANGE.Submit_Date</CommandText>
                     <TablixCell>
                       <CellContents>
                         <Textbox Name="Description">
+                          <CanGrow>true</CanGrow>
                           <KeepTogether>true</KeepTogether>
                           <Paragraphs>
                             <Paragraph>
@@ -473,20 +574,20 @@ order by CHG_INFRASTRUCTURE_CHANGE.Submit_Date</CommandText>
                     </TablixCell>
                     <TablixCell>
                       <CellContents>
-                        <Textbox Name="CHANGE_REQUEST_STATUS">
+                        <Textbox Name="Detailed_Decription">
                           <KeepTogether>true</KeepTogether>
                           <Paragraphs>
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value>=Fields!CHANGE_REQUEST_STATUS.Value</Value>
+                                  <Value>=Fields!Detailed_Decription.Value</Value>
                                   <Style />
                                 </TextRun>
                               </TextRuns>
                               <Style />
                             </Paragraph>
                           </Paragraphs>
-                          <rd:DefaultName>CHANGE_REQUEST_STATUS</rd:DefaultName>
+                          <rd:DefaultName>Detailed_Decription</rd:DefaultName>
                           <Style>
                             <Border>
                               <Color>LightGrey</Color>
@@ -503,13 +604,14 @@ order by CHG_INFRASTRUCTURE_CHANGE.Submit_Date</CommandText>
                     </TablixCell>
                     <TablixCell>
                       <CellContents>
-                        <Textbox Name="PRIORITY">
+                        <Textbox Name="STATUS">
+                          <CanGrow>true</CanGrow>
                           <KeepTogether>true</KeepTogether>
                           <Paragraphs>
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value>=Fields!PRIORITY.Value</Value>
+                                  <Value>=Fields!STATUS.Value</Value>
                                   <Style>
                                     <FontFamily>Arial</FontFamily>
                                   </Style>
@@ -518,7 +620,7 @@ order by CHG_INFRASTRUCTURE_CHANGE.Submit_Date</CommandText>
                               <Style />
                             </Paragraph>
                           </Paragraphs>
-                          <rd:DefaultName>PRIORITY</rd:DefaultName>
+                          <rd:DefaultName>STATUS</rd:DefaultName>
                           <Style>
                             <Border>
                               <Color>LightGrey</Color>
@@ -535,13 +637,14 @@ order by CHG_INFRASTRUCTURE_CHANGE.Submit_Date</CommandText>
                     </TablixCell>
                     <TablixCell>
                       <CellContents>
-                        <Textbox Name="Submitter">
+                        <Textbox Name="priority">
+                          <CanGrow>true</CanGrow>
                           <KeepTogether>true</KeepTogether>
                           <Paragraphs>
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value>=Fields!Submitter.Value</Value>
+                                  <Value>=Fields!priority.Value</Value>
                                   <Style>
                                     <FontFamily>Arial</FontFamily>
                                   </Style>
@@ -550,7 +653,7 @@ order by CHG_INFRASTRUCTURE_CHANGE.Submit_Date</CommandText>
                               <Style />
                             </Paragraph>
                           </Paragraphs>
-                          <rd:DefaultName>Submitter</rd:DefaultName>
+                          <rd:DefaultName>priority</rd:DefaultName>
                           <Style>
                             <Border>
                               <Color>LightGrey</Color>
@@ -568,6 +671,7 @@ order by CHG_INFRASTRUCTURE_CHANGE.Submit_Date</CommandText>
                     <TablixCell>
                       <CellContents>
                         <Textbox Name="Submit_Date">
+                          <CanGrow>true</CanGrow>
                           <KeepTogether>true</KeepTogether>
                           <Paragraphs>
                             <Paragraph>
@@ -598,12 +702,148 @@ order by CHG_INFRASTRUCTURE_CHANGE.Submit_Date</CommandText>
                         </Textbox>
                       </CellContents>
                     </TablixCell>
+                    <TablixCell>
+                      <CellContents>
+                        <Textbox Name="Assigned_Group">
+                          <CanGrow>true</CanGrow>
+                          <KeepTogether>true</KeepTogether>
+                          <Paragraphs>
+                            <Paragraph>
+                              <TextRuns>
+                                <TextRun>
+                                  <Value>=Fields!Assigned_Group.Value</Value>
+                                  <Style>
+                                    <FontFamily>Arial</FontFamily>
+                                  </Style>
+                                </TextRun>
+                              </TextRuns>
+                              <Style />
+                            </Paragraph>
+                          </Paragraphs>
+                          <rd:DefaultName>Assigned_Group</rd:DefaultName>
+                          <Style>
+                            <Border>
+                              <Color>LightGrey</Color>
+                              <Style>Solid</Style>
+                            </Border>
+                            <BackgroundColor>=IIF(ROWNUMBER(NOTHING) MOD 2, "#FBE4D6", "Transparent")</BackgroundColor>
+                            <PaddingLeft>2pt</PaddingLeft>
+                            <PaddingRight>2pt</PaddingRight>
+                            <PaddingTop>2pt</PaddingTop>
+                            <PaddingBottom>2pt</PaddingBottom>
+                          </Style>
+                        </Textbox>
+                      </CellContents>
+                    </TablixCell>
+                    <TablixCell>
+                      <CellContents>
+                        <Textbox Name="Assignee">
+                          <CanGrow>true</CanGrow>
+                          <KeepTogether>true</KeepTogether>
+                          <Paragraphs>
+                            <Paragraph>
+                              <TextRuns>
+                                <TextRun>
+                                  <Value>=Fields!Assignee.Value</Value>
+                                  <Style>
+                                    <FontFamily>Arial</FontFamily>
+                                  </Style>
+                                </TextRun>
+                              </TextRuns>
+                              <Style />
+                            </Paragraph>
+                          </Paragraphs>
+                          <rd:DefaultName>Assignee</rd:DefaultName>
+                          <Style>
+                            <Border>
+                              <Color>LightGrey</Color>
+                              <Style>Solid</Style>
+                            </Border>
+                            <BackgroundColor>=IIF(ROWNUMBER(NOTHING) MOD 2, "#FBE4D6", "Transparent")</BackgroundColor>
+                            <PaddingLeft>2pt</PaddingLeft>
+                            <PaddingRight>2pt</PaddingRight>
+                            <PaddingTop>2pt</PaddingTop>
+                            <PaddingBottom>2pt</PaddingBottom>
+                          </Style>
+                        </Textbox>
+                      </CellContents>
+                    </TablixCell>
+                    <TablixCell>
+                      <CellContents>
+                        <Textbox Name="SLM_Status">
+                          <CanGrow>true</CanGrow>
+                          <KeepTogether>true</KeepTogether>
+                          <Paragraphs>
+                            <Paragraph>
+                              <TextRuns>
+                                <TextRun>
+                                  <Value>=Fields!SLM_Status.Value</Value>
+                                  <Style>
+                                    <FontFamily>Arial</FontFamily>
+                                  </Style>
+                                </TextRun>
+                              </TextRuns>
+                              <Style />
+                            </Paragraph>
+                          </Paragraphs>
+                          <rd:DefaultName>SLM_Status</rd:DefaultName>
+                          <Style>
+                            <Border>
+                              <Color>LightGrey</Color>
+                              <Style>Solid</Style>
+                            </Border>
+                            <BackgroundColor>=IIF(ROWNUMBER(NOTHING) MOD 2, "#FBE4D6", "Transparent")</BackgroundColor>
+                            <PaddingLeft>2pt</PaddingLeft>
+                            <PaddingRight>2pt</PaddingRight>
+                            <PaddingTop>2pt</PaddingTop>
+                            <PaddingBottom>2pt</PaddingBottom>
+                          </Style>
+                        </Textbox>
+                      </CellContents>
+                    </TablixCell>
+                    <TablixCell>
+                      <CellContents>
+                        <Textbox Name="Required_ResolutionDate">
+                          <CanGrow>true</CanGrow>
+                          <KeepTogether>true</KeepTogether>
+                          <Paragraphs>
+                            <Paragraph>
+                              <TextRuns>
+                                <TextRun>
+                                  <Value>=Fields!Required_ResolutionDate.Value</Value>
+                                  <Style>
+                                    <FontFamily>Arial</FontFamily>
+                                    <Format>dd/MM/yyyy HH:mm</Format>
+                                  </Style>
+                                </TextRun>
+                              </TextRuns>
+                              <Style />
+                            </Paragraph>
+                          </Paragraphs>
+                          <rd:DefaultName>Required_ResolutionDate</rd:DefaultName>
+                          <Style>
+                            <Border>
+                              <Color>LightGrey</Color>
+                              <Style>Solid</Style>
+                            </Border>
+                            <BackgroundColor>=IIF(ROWNUMBER(NOTHING) MOD 2, "#FBE4D6", "Transparent")</BackgroundColor>
+                            <PaddingLeft>2pt</PaddingLeft>
+                            <PaddingRight>2pt</PaddingRight>
+                            <PaddingTop>2pt</PaddingTop>
+                            <PaddingBottom>2pt</PaddingBottom>
+                          </Style>
+                        </Textbox>
+                      </CellContents>
+                    </TablixCell>
                   </TablixCells>
                 </TablixRow>
               </TablixRows>
             </TablixBody>
             <TablixColumnHierarchy>
               <TablixMembers>
+                <TablixMember />
+                <TablixMember />
+                <TablixMember />
                 <TablixMember />
                 <TablixMember />
                 <TablixMember />
@@ -624,11 +864,11 @@ order by CHG_INFRASTRUCTURE_CHANGE.Submit_Date</CommandText>
               </TablixMembers>
             </TablixRowHierarchy>
             <DataSetName>a1telekom_prd_ar</DataSetName>
-            <PageName>CRQ - GRC and SOX</PageName>
+            <PageName>Technical &amp; Customer Service Desk_srb</PageName>
             <Top>0mm</Top>
             <Left>0mm</Left>
             <Height>12mm</Height>
-            <Width>328.67001mm</Width>
+            <Width>400.2833mm</Width>
             <Style>
               <Border>
                 <Style>None</Style>
@@ -643,7 +883,7 @@ order by CHG_INFRASTRUCTURE_CHANGE.Submit_Date</CommandText>
           </Border>
         </Style>
       </Body>
-      <Width>376.50668mm</Width>
+      <Width>400.2833mm</Width>
       <Page>
         <PageFooter>
           <Height>11.43mm</Height>
@@ -655,7 +895,7 @@ order by CHG_INFRASTRUCTURE_CHANGE.Submit_Date</CommandText>
             </Border>
           </Style>
         </PageFooter>
-        <PageHeight>297mm</PageHeight>
+        <PageHeight>297.00001mm</PageHeight>
         <PageWidth>210mm</PageWidth>
         <LeftMargin>20mm</LeftMargin>
         <RightMargin>20mm</RightMargin>
@@ -666,45 +906,13 @@ order by CHG_INFRASTRUCTURE_CHANGE.Submit_Date</CommandText>
       </Page>
     </ReportSection>
   </ReportSections>
-  <ReportParameters>
-    <ReportParameter Name="StartDate">
-      <DataType>DateTime</DataType>
-      <DefaultValue>
-        <Values>
-          <Value>01/01/2016 00:00:00</Value>
-        </Values>
-      </DefaultValue>
-      <Prompt>StartDate</Prompt>
-    </ReportParameter>
-    <ReportParameter Name="EndDate">
-      <DataType>DateTime</DataType>
-      <DefaultValue>
-        <Values>
-          <Value>=Today()</Value>
-        </Values>
-      </DefaultValue>
-      <Prompt>EndDate</Prompt>
-    </ReportParameter>
-  </ReportParameters>
   <ReportParametersLayout>
     <GridLayoutDefinition>
       <NumberOfColumns>4</NumberOfColumns>
       <NumberOfRows>2</NumberOfRows>
-      <CellDefinitions>
-        <CellDefinition>
-          <ColumnIndex>0</ColumnIndex>
-          <RowIndex>0</RowIndex>
-          <ParameterName>StartDate</ParameterName>
-        </CellDefinition>
-        <CellDefinition>
-          <ColumnIndex>1</ColumnIndex>
-          <RowIndex>0</RowIndex>
-          <ParameterName>EndDate</ParameterName>
-        </CellDefinition>
-      </CellDefinitions>
     </GridLayoutDefinition>
   </ReportParametersLayout>
   <rd:ReportUnitType>Mm</rd:ReportUnitType>
   <rd:ReportServerUrl>http://10.250.235.177/ReportServer</rd:ReportServerUrl>
-  <rd:ReportID>bd500192-07c4-4a38-82b9-40b0cb2319ac</rd:ReportID>
+  <rd:ReportID>f628d8e4-8f15-4433-8602-0f3549e05877</rd:ReportID>
 </Report>
