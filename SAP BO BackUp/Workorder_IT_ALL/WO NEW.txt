@@ -1,0 +1,43 @@
+SELECT
+  SRM_WOI_WORKORDER.Work_Order_ID,
+  SRM_WOI_WORKORDER.Region,
+  SRM_WOI_WORKORDER.Summary,
+  SRM_WOI_WORKORDER.Detailed_Description,
+  SRM_WO_STATUS.Status,
+  SRM_WO_PRIORITY.Priority,
+  dbo.fn_adjusted_date(SRM_WOI_WORKORDER.Submit_Date),
+  SRM_WOI_WORKORDER.ASGRP,
+  dbo.fn_adjusted_date(SRM_WOI_WORKORDER.Actual_Start_Date) ,
+  dbo.fn_adjusted_date(SRM_WOI_WORKORDER.Actual_End_Date) ,
+  SRM_WOI_WORKORDER.RequestAssignee,
+  dbo.fn_adjusted_date(SRM_WOI_WORKORDER.Completed_Date)
+FROM
+  ANA_RPT_OBJECTS_VW,
+  (
+  SELECT ENUMID, ENUMVALUE AS STATUS
+FROM ANA_SRM_ENUM_VW
+WHERE RESOLVED_SCHEMANAME = 'WOI:WorkOrder'
+AND FIELDID = 7
+  )  SRM_WO_STATUS RIGHT OUTER JOIN (
+  SELECT * FROM ANA_WOI_WORKORDER_VW
+WHERE EXISTS
+( SELECT DISTINCT 1 FROM CTM_PEOPLE_PERMISSION_GROUPS CTM1
+  WHERE CTM1.REMEDY_LOGIN_ID = @VARIABLE('BOUSER')
+  AND (( CTM1.COMPANY IS NULL AND PERMISSION_GROUP_ID =  1000000000 )
+              OR ( CTM1.COMPANY IS NOT NULL
+                      AND CTM1.COMPANY = ANA_WOI_WORKORDER_VW.Location_Company )
+           )
+)
+  )  SRM_WOI_WORKORDER ON (SRM_WOI_WORKORDER.Status=SRM_WO_STATUS.ENUMID)
+   LEFT OUTER JOIN (
+  SELECT ENUMID, ENUMVALUE AS Priority
+FROM ANA_SRM_ENUM_VW
+WHERE (RESOLVED_SCHEMANAME IN ('WOI:WorkOrder', 'Dummy')
+AND FIELDID IN (1000000164, -99))
+  )  SRM_WO_PRIORITY ON (SRM_WOI_WORKORDER.Priority=SRM_WO_PRIORITY.ENUMID)
+WHERE
+  (
+   dbo.fn_adjusted_date(SRM_WOI_WORKORDER.Submit_Date)  >=  ANA_RPT_OBJECTS_VW.Last_07Days_FNW
+   AND
+   SRM_WOI_WORKORDER.ASGRP  IN  ( 'Backend & Billing_Payment_slo','Backend & Billing_Postpaid_slo','Backend & Billing_Provisioning_slo','Backend & Billing_Integration(ESB)_slo','CFS_CRM_slo','CFS_VAS&Portals_slo','IT Support_Fix_slo','CFS_EPI_slo','CFS_DMS_slo','CFS_FMS_slo','CFS_Wincash_slo','IT & SP & Delivery_Backend_slo'  )
+  )

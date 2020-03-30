@@ -1,0 +1,72 @@
+SELECT
+  HPD_HELP_DESK.Incident_Number ,
+  dbo.fn_adjusted_date( HPD_HELP_DESK.Submit_Date),
+  HPD_HELP_DESK.Assigned_Group ,
+  HPD_HELP_DESK.Assignee ,
+  dbo.fn_adjusted_date( HPD_HELP_DESK.Last_Resolved_Date),
+  HPD_HELP_DESK.Description,
+  HPD_HELP_DESK.Detailed_Decription,
+  HPD_HELP_DESK.Resolution,
+  dbo.fn_adjusted_date( HPD_HELP_DESK.Reported_Date),
+  SLM_STATUS.SLM_Status ,
+  HPD_STATUS.STATUS,
+  HPD_PRIORITY.priority
+FROM
+  ANA_RPT_OBJECTS_VW,
+  (
+  SELECT ENUMID, ENUMVALUE AS STATUS
+FROM ANA_HPD_ENUM_VW
+WHERE RESOLVED_SCHEMANAME = 'HPD:Help Desk'
+AND FIELDID = 7
+  )  HPD_STATUS RIGHT OUTER JOIN (
+  SELECT HPD.Entry_ID,HPD.Incident_Number,HPD.Description, CAST(HPD.Detailed_Decription AS NVARCHAR(MAX)) as Detailed_Decription, HPD.Priority_Weight, HPD.StageCondition, HPD.PreviousStatus,HPD.CurrentStage, HPD.Submitter, HPD.Last_Modified_By, HPD.Last_Modified_Date, HPD.Submit_Date, HPD.First_Name, HPD.Middle_Initial, HPD.Last_Name, HPD.Phone_Number,HPD.Contact_Company, HPD.Organization,HPD.Department, HPD.Site, HPD.Site_Group, HPD.Region, HPD.Country, HPD.STATE_PROVINCE, HPD.City, HPD.Internet_E_mail, HPD.CORPORATE_ID, HPD.STREET, HPD.ZIP_POSTAL_CODE,HPD.TIME_ZONE, HPD.DESK_LOCATION,HPD.MAIL_STATION, HPD.ADDITIONAL_LOCATION_DETAILS, HPD.Direct_Contact_First_Name,HPD.Direct_Contact_Middle_Initial, HPD.Direct_Contact_Last_Name,HPD.Direct_Contact_Phone_Number, HPD.Direct_Contact_Internet_E_mail, HPD.Direct_Contact_Company, HPD.Direct_Contact_Organization, HPD.Direct_Contact_Department, HPD.Direct_Contact_Site, HPD.Direct_Contact_Region, HPD.Direct_Contact_Site_Group,HPD.Direct_Contact_Country, HPD.Direct_Contact_CITY, HPD.Direct_Contact_STATE_PROVINCE, HPD.Direct_Contact_STREET,HPD.Direct_Contact_ZIP_POSTAL_CODE, HPD.Direct_Contact_TIME_ZONE, HPD.Direct_Contact_DESK_LOCATION, HPD.Direct_Contact_MAIL_STATION, HPD.Company,HPD.ServiceCI,HPD.HPD_CI, HPD.Reported_Date,HPD.Categorization_Tier_1,HPD.Categorization_Tier_2, HPD.Categorization_Tier_3,HPD.Product_Categorization_Tier_1,HPD.Product_Categorization_Tier_2, HPD.Product_Categorization_Tier_3,HPD.Product_Name,HPD.Product_Model_Version,HPD.Manufacturer, HPD.Individual_Transfers, HPD.Group_Transfers, HPD.Total_Transfers,HPD.Assigned_Support_Company,HPD.Assigned_Support_Organization,HPD.Assigned_Group, HPD.Assignee, HPD.Owner_Support_Company, HPD.Owner_Support_Organization, HPD.Owner_Group, HPD.Owner,HPD.Inbound, HPD.Outbound,HPD.Vendor_Name,HPD.Vendor_Organization,HPD.Vendor_Group, HPD.Vendor_First_Name,HPD.Vendor_Last_Name,HPD.Vendor_Phone, HPD.Vendor_Email,HPD.Vendor_Ticket_Number,HPD.Reported_to_Vendor,HPD.Vendor_Responded_On,HPD.Vendor_Resolved_Date,CAST(HPD.Resolution as NVARCHAR(MAX)) as Resolution,HPD.Resolution_Method, HPD.Generic_Categorization_Tier_1,HPD.Satisfaction_Rating, HPD.Required_Resolution_DateTime,HPD.Estimated_Resolution_Date, HPD.Last_Resolved_Date,HPD.Resolution_Category,HPD.Resolution_Category_Tier_2,HPD.Resolution_Category_Tier_3,HPD.Closure_Product_Category_Tier1,HPD.Closure_Product_Category_Tier2,HPD.Closure_Product_Category_Tier3,HPD.Closure_Product_Name, HPD.Closure_Product_Model_Version, HPD.Closure_Manufacturer, HPD.Next_Target_Date,HPD.Total_Escalation_Level,HPD.Responded_Date,HPD.Last_Acknowledged_Date,HPD.Re_Opened_Date,HPD.InstanceId,HPD.SRID,HPD.Status, HPD.z1D_Template_Name,HPD.Impact,HPD.Urgency,HPD.Priority,HPD.Status_Reason,HPD.Escalated_,HPD.SLA_Responded,HPD.Closed_Date,HPD.Service_Type,SLM_Status,SRInstanceID,Incident_Association_Type,zBusinessEntityOnBS__c  FROM HPD_HELP_DESK HPD
+WHERE EXISTS
+( SELECT DISTINCT 1 FROM CTM_PEOPLE_PERMISSION_GROUPS CTM1
+  WHERE CTM1.REMEDY_LOGIN_ID = @VARIABLE('BOUSER')
+  AND (( CTM1.COMPANY IS NULL AND PERMISSION_GROUP_ID =  1000000000 )
+              OR ( CTM1.COMPANY IS NOT NULL
+                       AND ( CTM1.COMPANY = HPD.COMPANY
+                                 OR CTM1.COMPANY = HPD.CONTACT_COMPANY
+                                 OR CTM1.COMPANY = HPD.Direct_Contact_Company
+                                 OR CTM1.COMPANY = HPD.Assigned_Support_Company
+                                 OR CTM1.COMPANY = HPD.Owner_Support_Company )
+                    )
+           )
+)
+
+UNION
+
+SELECT HPDA.Original_Request_ID as Entry_ID,HPDA.Incident_Number, HPDA.Description, CAST(HPDA.Detailed_Decription AS NVARCHAR(MAX)), HPDA.Priority_Weight, HPDA.StageCondition, HPDA.PreviousStatus, HPDA.CurrentStage, HPDA.Submitter, HPDA.Original_Last_Modified_By, HPDA.Original_Last_Modified_Date, HPDA.Reported_Date, HPDA.First_Name,HPDA.Middle_Initial,HPDA.Last_Name, HPDA.Phone_Number,HPDA.Contact_Company, HPDA.Organization, HPDA.Department,HPDA.Site,HPDA.Site_Group, HPDA.Region, HPDA.Country, HPDA.STATE_PROVINCE, HPDA.City, HPDA.Internet_E_mail, HPDA.CORPORATE_ID, HPDA.STREET, HPDA.ZIP_POSTAL_CODE,HPDA.TIME_ZONE,HPDA.DESK_LOCATION, HPDA.MAIL_STATION,HPDA.ADDITIONAL_LOCATION_DETAILS,HPDA.Direct_Contact_First_Name,HPDA.Direct_Contact_Middle_Initial,HPDA.Direct_Contact_Last_Name, HPDA.Direct_Contact_Phone_Number, HPDA.Direct_Contact_Internet_E_mail, HPDA.Direct_Contact_Company, HPDA.Direct_Contact_Organization, HPDA.Direct_Contact_Department, HPDA.Direct_Contact_Site, HPDA.Direct_Contact_Region,HPDA.Direct_Contact_Site_Group, HPDA.Direct_Contact_Country, HPDA.Direct_Contact_CITY, HPDA.Direct_Contact_STATE_PROVINCE, HPDA.Direct_Contact_STREET,HPDA.Direct_Contact_ZIP_POSTAL_CODE, HPDA.Direct_Contact_TIME_ZONE, HPDA.Direct_Contact_DESK_LOCATION, HPDA.Direct_Contact_MAIL_STATION, HPDA.Company, HPDA.ServiceCI, HPDA.HPD_CI,HPDA.Reported_Date, HPDA.Categorization_Tier_1,HPDA.Categorization_Tier_2,HPDA.Categorization_Tier_3,HPDA.Product_Categorization_Tier_1, HPDA.Product_Categorization_Tier_2, HPDA.Product_Categorization_Tier_3,HPDA.Product_Name, HPDA.Product_Model_Version,HPDA.Manufacturer, HPDA.Individual_Transfers,HPDA.Group_Transfers,HPDA.Total_Transfers,HPDA.Assigned_Support_Company,HPDA.Assigned_Support_Organization,HPDA.Assigned_Group,HPDA.Assignee,HPDA.Owner_Support_Company,HPDA.Owner_Support_Organization,HPDA.Owner_Group,HPDA.Owner,HPDA.Inbound,HPDA.Outbound,HPDA.Vendor_Name,HPDA.Vendor_Organization,HPDA.Vendor_Group,HPDA.Vendor_First_Name,HPDA.Vendor_Last_Name,HPDA.Vendor_Phone,HPDA.Vendor_Email, HPDA.Vendor_Ticket_Number,HPDA.Reported_to_Vendor,HPDA.Vendor_Responded_On,HPDA.Vendor_Resolved_Date,CAST(HPDA.Resolution as NVARCHAR(MAX)), HPDA.Resolution_Method,HPDA.Generic_Categorization_Tier_1,HPDA.Satisfaction_Rating,HPDA.Required_Resolution_DateTime,HPDA.Estimated_Resolution_Date,HPDA.Last_Resolved_Date,HPDA.Resolution_Category,HPDA.Resolution_Category_Tier_2,HPDA.Resolution_Category_Tier_3,HPDA.Closure_Product_Category_Tier1,HPDA.Closure_Product_Category_Tier2,HPDA.Closure_Product_Category_Tier3,HPDA.Closure_Product_Name, HPDA.Closure_Product_Model_Version,HPDA.Closure_Manufacturer,HPDA.Next_Target_Date,HPDA.Total_Escalation_Level,HPDA.Responded_Date,HPDA.Last_Acknowledged_Date,HPDA.Re_Opened_Date,HPDA.InstanceId,HPDA.SRID,HPDA.Status,HPDA.z1D_Template_Name,HPDA.Impact,HPDA.Urgency,HPDA.Priority,HPDA.Status_Reason,HPDA.Escalated_,HPDA.SLA_Responded,HPDA.Closed_Date,HPDA.Service_Type,SLM_Status,SRInstanceID,Incident_Association_Type,zBusinessEntityOnBS__c  FROM  HPD_HELP_DESK_ARCHIVE HPDA
+WHERE EXISTS
+( SELECT DISTINCT 1 FROM CTM_PEOPLE_PERMISSION_GROUPS CTM1
+  WHERE CTM1.REMEDY_LOGIN_ID = @VARIABLE('BOUSER')
+  AND (( CTM1.COMPANY IS NULL AND PERMISSION_GROUP_ID =  1000000000 )
+              OR ( CTM1.COMPANY IS NOT NULL
+                       AND ( CTM1.COMPANY = HPDA.COMPANY
+                                 OR CTM1.COMPANY = HPDA.CONTACT_COMPANY
+                                 OR CTM1.COMPANY = HPDA.Direct_Contact_Company
+                                 OR CTM1.COMPANY = HPDA.Assigned_Support_Company
+                                 OR CTM1.COMPANY = HPDA.Owner_Support_Company )
+                    )
+           )
+)
+  )  HPD_HELP_DESK ON (HPD_HELP_DESK.Status=HPD_STATUS.ENUMID)
+   LEFT OUTER JOIN (
+  SELECT ENUMID, ENUMVALUE AS PRIORITY
+FROM ANA_HPD_ENUM_VW
+WHERE RESOLVED_SCHEMANAME = 'HPD:Help Desk'
+AND FIELDID = 1000000164
+  )  HPD_PRIORITY ON (HPD_HELP_DESK.Priority=HPD_PRIORITY.ENUMID) LEFT OUTER JOIN (
+  SELECT ENUMID, ENUMVALUE AS SLM_STATUS
+FROM ANA_HPD_ENUM_VW
+WHERE (RESOLVED_SCHEMANAME IN ('HPD:Help Desk', 'Dummy')
+AND FIELDID IN (1000003009, -99))
+  )  SLM_STATUS ON (HPD_HELP_DESK.SLM_Status=SLM_STATUS.ENUMID)
+WHERE
+  (
+   dbo.fn_adjusted_date( HPD_HELP_DESK.Last_Resolved_Date)  >=  ANA_RPT_OBJECTS_VW.Last_07Days_FNW
+   AND
+   HPD_HELP_DESK.Assigned_Group   IN  ( 'Backend & Billing_Integration(ESB)_slo','Backend & Billing_Postpaid_slo','Backend & Billing_Provisioning_slo','CFS_CRM_slo','CFS_VAS&Portals_slo','IT Support_Fix_slo','Backend & Billing_Payment_slo','CFS_EPI_slo','CFS_DMS_slo','CFS_FMS_slo','CFS_Wincash_slo'  )
+   AND
+   HPD_STATUS.STATUS  IN  ( 'Resolved','Closed'  )
+  )
