@@ -6,58 +6,42 @@
     <DataSource Name="a1telekom_prd_ar">
       <DataSourceReference>/a1telekom_prd_ar</DataSourceReference>
       <rd:SecurityType>None</rd:SecurityType>
-      <rd:DataSourceID>bc2eb5ff-0f79-444e-8cb4-8e3b091a1df4</rd:DataSourceID>
+      <rd:DataSourceID>54d9c835-a521-472f-a98b-63e3609aa907</rd:DataSourceID>
     </DataSource>
   </DataSources>
   <DataSets>
     <DataSet Name="a1telekom_prd_ar">
       <Query>
         <DataSourceName>a1telekom_prd_ar</DataSourceName>
-        <CommandText>SELECT 
+        <CommandText>SELECT
   SRM_WOI_WORKORDER.Work_Order_ID,
   dbo.fn_adjusted_date(SRM_WOI_WORKORDER.Submit_Date) as Submit_Date,
-  dbo.fn_adjusted_date(SRM_WOI_WORKORDER.Completed_Date) as Completed_Date,
-  dbo.fn_adjusted_date( WO_TMS_TASK.Actual_Start_Date)  as Start_Date,
-  dbo.fn_adjusted_date(WO_TMS_TASK.Actual_End_Date) as End_Date,
-  SRM_WOI_WORKORDER.Summary,
-  SRM_WOI_WORKORDER.WO_TS__c,
-  SRM_WOI_WORKORDER.Business_Service,
+  cast(SRM_WOI_WORKORDER.Summary as nvarchar(255)) as Summary,
+  SRM_WOI_WORKORDER.ASGRP,
+  SRM_WOI_WORKORDER.Support_Group_Name,
+  SRM_WOI_WORKORDER.Submitter,
   SRM_WO_PRIORITY.Priority,
   SRM_WO_STATUS.Status,
-  SRM_WOI_WORKORDER.Support_Group_Name,
-  SRM_WOI_WORKORDER.ASGRP,
   SRM_WOI_WORKORDER.ASLOGID,
-  SRM_REQUEST.Submitter,
-  SRM_REQUEST.Assigned_Support_Company,
-  SRM_WOI_WORKORDER.Support_Organization,
-  SRM_WOI_WORKORDER.CompletionDetails,
-  DATEPART(wk, dbo.fn_adjusted_date(SRM_WOI_WORKORDER.Submit_Date)) as Week_Number
-
+  SRM_REQUEST.Submitter as srm_request_submitter,
+  SRM_WOI_WORKORDER.First_Name,
+  SRM_WOI_WORKORDER.Last_Name,
+  cast(SRM_REQUEST.details as nvarchar(255)) as details,
+  dbo.fn_adjusted_date(SRM_WOI_WORKORDER.Completed_Date)  as Completed_Date
 FROM
 
 SRM_WOI_WORKORDER
-
+left outer join SRM_WO_PRIORITY
+on SRM_WOI_WORKORDER.[Status] = SRM_WO_PRIORITY.ENUMID
 left outer join SRM_WO_STATUS
 on SRM_WOI_WORKORDER.[Status] = SRM_WO_STATUS.ENUMID
-left outer join SRM_WO_PRIORITY
-on SRM_WOI_WORKORDER.Priority = SRM_WO_PRIORITY.ENUMID
-left outer join WO_TMS_TASK
-on SRM_WOI_WORKORDER.Work_Order_ID = WO_TMS_TASK.RootRequestName
 right outer join SRM_REQUEST
 on SRM_WOI_WORKORDER.SRID = SRM_REQUEST.Request_Number
-
-
 WHERE
   (
-   dbo.fn_adjusted_date(SRM_WOI_WORKORDER.Submit_Date)  &gt;  '01/01/2016 00:0:0'
+   SRM_WOI_WORKORDER.Support_Group_Name  IN  ( 'NW Operations_RNO_slo','NW Operations_RNO_srb','NW Operations_TNO_slo','NW Operations_TNO_srb'  )
    AND
-   SRM_WO_STATUS.Status  IN  ( 'Assigned','Pending','Waiting Approval','Planning','In Progress'  )
-   AND
-   (
-    SRM_WOI_WORKORDER.ASGRP  IN  ( 'BS &amp; DS_Billing Mediation','BS &amp; DS_Billing Prepaid','BS &amp; DS_CRM','BS &amp; DS_CRM_sim','BS &amp; DS_Customer Facing CSO_vsr','BS &amp; DS_Customer_Facing_CSO_vsr','BS &amp; DS_Provisioning_sim','BS &amp; DS_Provisioning_vsr','BS &amp; DS_VAS&amp;Portals','IT &amp; SP &amp; Delivery_ Payment_sim','Backend &amp; Billing_Mediation','Backend &amp; Billing_Payment_slo','Backend &amp; Billing_Postpaid_slo','Backend &amp; Billing_Provisioning_slo','RA, Fraud, Billing &amp; Collection_slo','Backend &amp; Billing_Integration(ESB)_slo','Backend &amp; Billing_Postpaid_srb','Backend &amp; Billing_Provisioning_srb','Backend &amp; Billing_R&amp;I_srb','CFS_CRM_slo','CFS_CSO_srb','CFS_Enterprise Applications_slo','CFS_VAS&amp;Portals_slo','VAS&amp;Portals'  )
-    OR
-    SRM_WOI_WORKORDER.Support_Group_Name  IN  ( 'BS &amp; DS_Billing Mediation','BS &amp; DS_Billing Mediation_sim','BS &amp; DS_Billing Mediation_vsr','BS &amp; DS_Billing Postpaid_sim','BS &amp; DS_Billing Postpaid_vsr','BS &amp; DS_Billing Prepaid','BS &amp; DS_Billing Prepaid_sim','BS &amp; DS_Billing_Mediation_sim','BS &amp; DS_Billing_Postpaid_sim','BS &amp; DS_CRM','BS &amp; DS_CRM_sim','BS &amp; DS_Customer Facing CSO_vsr','BS &amp; DS_Customer_Facing_CSO_vsr','BS &amp; DS_Enterprise Applications_sim','BS &amp; DS_Integration (ESB)_sim','BS &amp; DS_Provisioning_sim','BS &amp; DS_Provisioning_vsr','BS &amp; DS_VAS&amp;Portals','IT &amp; SP &amp; Delivery_ Payment_sim'  )
-   )
+   dbo.fn_adjusted_date(SRM_WOI_WORKORDER.Submit_Date)  &gt;  '01/01/2017 00:0:0'
   )
 
   order by SRM_WOI_WORKORDER.Submit_Date</CommandText>
@@ -71,28 +55,20 @@ WHERE
           <DataField>Submit_Date</DataField>
           <rd:TypeName>System.DateTime</rd:TypeName>
         </Field>
-        <Field Name="Completed_Date">
-          <DataField>Completed_Date</DataField>
-          <rd:TypeName>System.DateTime</rd:TypeName>
-        </Field>
-        <Field Name="Start_Date">
-          <DataField>Start_Date</DataField>
-          <rd:TypeName>System.DateTime</rd:TypeName>
-        </Field>
-        <Field Name="End_Date">
-          <DataField>End_Date</DataField>
-          <rd:TypeName>System.DateTime</rd:TypeName>
-        </Field>
         <Field Name="Summary">
           <DataField>Summary</DataField>
           <rd:TypeName>System.String</rd:TypeName>
         </Field>
-        <Field Name="WO_TS__c">
-          <DataField>WO_TS__c</DataField>
+        <Field Name="ASGRP">
+          <DataField>ASGRP</DataField>
           <rd:TypeName>System.String</rd:TypeName>
         </Field>
-        <Field Name="Business_Service">
-          <DataField>Business_Service</DataField>
+        <Field Name="Support_Group_Name">
+          <DataField>Support_Group_Name</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
+        <Field Name="Submitter">
+          <DataField>Submitter</DataField>
           <rd:TypeName>System.String</rd:TypeName>
         </Field>
         <Field Name="Priority">
@@ -103,40 +79,29 @@ WHERE
           <DataField>Status</DataField>
           <rd:TypeName>System.String</rd:TypeName>
         </Field>
-        <Field Name="Support_Group_Name">
-          <DataField>Support_Group_Name</DataField>
-          <rd:TypeName>System.String</rd:TypeName>
-        </Field>
-        <Field Name="ASGRP">
-          <DataField>ASGRP</DataField>
-          <rd:TypeName>System.String</rd:TypeName>
-        </Field>
         <Field Name="ASLOGID">
           <DataField>ASLOGID</DataField>
           <rd:TypeName>System.String</rd:TypeName>
         </Field>
-        <Field Name="Submitter">
-          <DataField>Submitter</DataField>
+        <Field Name="srm_request_submitter">
+          <DataField>srm_request_submitter</DataField>
           <rd:TypeName>System.String</rd:TypeName>
         </Field>
-        <Field Name="Assigned_Support_Company">
-          <DataField>Assigned_Support_Company</DataField>
+        <Field Name="First_Name">
+          <DataField>First_Name</DataField>
           <rd:TypeName>System.String</rd:TypeName>
         </Field>
-        <Field Name="Support_Organization">
-          <DataField>Support_Organization</DataField>
+        <Field Name="Last_Name">
+          <DataField>Last_Name</DataField>
           <rd:TypeName>System.String</rd:TypeName>
         </Field>
-        <Field Name="CompletionDetails">
-          <DataField>CompletionDetails</DataField>
+        <Field Name="details">
+          <DataField>details</DataField>
           <rd:TypeName>System.String</rd:TypeName>
         </Field>
-        <Field Name="Week_Number">
-          <DataField>Week_Number</DataField>
-          <rd:TypeName>System.Int32</rd:TypeName>
-        </Field>
-        <Field Name="Week_Of_Year">
-          <Value>="Week " &amp; Fields!Week_Number.Value &amp; " of " &amp; year(Fields!Submit_Date.Value)</Value>
+        <Field Name="Completed_Date">
+          <DataField>Completed_Date</DataField>
+          <rd:TypeName>System.DateTime</rd:TypeName>
         </Field>
       </Fields>
     </DataSet>
@@ -149,13 +114,19 @@ WHERE
             <TablixBody>
               <TablixColumns>
                 <TablixColumn>
-                  <Width>40.875mm</Width>
+                  <Width>34.94834mm</Width>
                 </TablixColumn>
                 <TablixColumn>
-                  <Width>73.895mm</Width>
+                  <Width>41.51mm</Width>
                 </TablixColumn>
                 <TablixColumn>
-                  <Width>69.02665mm</Width>
+                  <Width>75mm</Width>
+                </TablixColumn>
+                <TablixColumn>
+                  <Width>57.17333mm</Width>
+                </TablixColumn>
+                <TablixColumn>
+                  <Width>56.75mm</Width>
                 </TablixColumn>
                 <TablixColumn>
                   <Width>25mm</Width>
@@ -164,37 +135,16 @@ WHERE
                   <Width>25mm</Width>
                 </TablixColumn>
                 <TablixColumn>
-                  <Width>50mm</Width>
+                  <Width>56.53834mm</Width>
                 </TablixColumn>
                 <TablixColumn>
-                  <Width>50mm</Width>
+                  <Width>88.28839mm</Width>
                 </TablixColumn>
                 <TablixColumn>
-                  <Width>50mm</Width>
+                  <Width>62.04171mm</Width>
                 </TablixColumn>
                 <TablixColumn>
-                  <Width>46.59003mm</Width>
-                </TablixColumn>
-                <TablixColumn>
-                  <Width>52.51667mm</Width>
-                </TablixColumn>
-                <TablixColumn>
-                  <Width>45.53165mm</Width>
-                </TablixColumn>
-                <TablixColumn>
-                  <Width>75mm</Width>
-                </TablixColumn>
-                <TablixColumn>
-                  <Width>86.80669mm</Width>
-                </TablixColumn>
-                <TablixColumn>
-                  <Width>75mm</Width>
-                </TablixColumn>
-                <TablixColumn>
-                  <Width>37.91161mm</Width>
-                </TablixColumn>
-                <TablixColumn>
-                  <Width>52.30505mm</Width>
+                  <Width>40.02837mm</Width>
                 </TablixColumn>
               </TablixColumns>
               <TablixRows>
@@ -203,7 +153,7 @@ WHERE
                   <TablixCells>
                     <TablixCell>
                       <CellContents>
-                        <Textbox Name="Textbox7">
+                        <Textbox Name="Textbox1">
                           <CanGrow>true</CanGrow>
                           <KeepTogether>true</KeepTogether>
                           <Paragraphs>
@@ -212,7 +162,6 @@ WHERE
                                 <TextRun>
                                   <Value>Work Order ID</Value>
                                   <Style>
-                                    <FontFamily>Arial</FontFamily>
                                     <FontWeight>Bold</FontWeight>
                                     <Color>White</Color>
                                   </Style>
@@ -223,7 +172,7 @@ WHERE
                               </Style>
                             </Paragraph>
                           </Paragraphs>
-                          <rd:DefaultName>Textbox7</rd:DefaultName>
+                          <rd:DefaultName>Textbox1</rd:DefaultName>
                           <Style>
                             <Border>
                               <Color>LightGrey</Color>
@@ -248,7 +197,7 @@ WHERE
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value>Work Order Submit Date - Week Name</Value>
+                                  <Value>Submit Date</Value>
                                   <Style>
                                     <FontWeight>Bold</FontWeight>
                                     <Color>White</Color>
@@ -278,7 +227,192 @@ WHERE
                     </TablixCell>
                     <TablixCell>
                       <CellContents>
-                        <Textbox Name="Textbox5">
+                        <Textbox Name="Textbox7">
+                          <CanGrow>true</CanGrow>
+                          <KeepTogether>true</KeepTogether>
+                          <Paragraphs>
+                            <Paragraph>
+                              <TextRuns>
+                                <TextRun>
+                                  <Value>Work Order Completed Date Time</Value>
+                                  <Style>
+                                    <FontWeight>Bold</FontWeight>
+                                    <Color>White</Color>
+                                  </Style>
+                                </TextRun>
+                              </TextRuns>
+                              <Style>
+                                <TextAlign>Center</TextAlign>
+                              </Style>
+                            </Paragraph>
+                          </Paragraphs>
+                          <rd:DefaultName>Textbox7</rd:DefaultName>
+                          <Style>
+                            <Border>
+                              <Color>LightGrey</Color>
+                              <Style>Solid</Style>
+                            </Border>
+                            <BackgroundColor>#f86e00</BackgroundColor>
+                            <VerticalAlign>Middle</VerticalAlign>
+                            <PaddingLeft>2pt</PaddingLeft>
+                            <PaddingRight>2pt</PaddingRight>
+                            <PaddingTop>2pt</PaddingTop>
+                            <PaddingBottom>2pt</PaddingBottom>
+                          </Style>
+                        </Textbox>
+                      </CellContents>
+                    </TablixCell>
+                    <TablixCell>
+                      <CellContents>
+                        <Textbox Name="Textbox9">
+                          <CanGrow>true</CanGrow>
+                          <KeepTogether>true</KeepTogether>
+                          <Paragraphs>
+                            <Paragraph>
+                              <TextRuns>
+                                <TextRun>
+                                  <Value>Requested By First Name</Value>
+                                  <Style>
+                                    <FontWeight>Bold</FontWeight>
+                                    <Color>White</Color>
+                                  </Style>
+                                </TextRun>
+                              </TextRuns>
+                              <Style>
+                                <TextAlign>Center</TextAlign>
+                              </Style>
+                            </Paragraph>
+                          </Paragraphs>
+                          <rd:DefaultName>Textbox9</rd:DefaultName>
+                          <Style>
+                            <Border>
+                              <Color>LightGrey</Color>
+                              <Style>Solid</Style>
+                            </Border>
+                            <BackgroundColor>#f86e00</BackgroundColor>
+                            <VerticalAlign>Middle</VerticalAlign>
+                            <PaddingLeft>2pt</PaddingLeft>
+                            <PaddingRight>2pt</PaddingRight>
+                            <PaddingTop>2pt</PaddingTop>
+                            <PaddingBottom>2pt</PaddingBottom>
+                          </Style>
+                        </Textbox>
+                      </CellContents>
+                    </TablixCell>
+                    <TablixCell>
+                      <CellContents>
+                        <Textbox Name="Textbox11">
+                          <CanGrow>true</CanGrow>
+                          <KeepTogether>true</KeepTogether>
+                          <Paragraphs>
+                            <Paragraph>
+                              <TextRuns>
+                                <TextRun>
+                                  <Value>Requested By Last Name</Value>
+                                  <Style>
+                                    <FontWeight>Bold</FontWeight>
+                                    <Color>White</Color>
+                                  </Style>
+                                </TextRun>
+                              </TextRuns>
+                              <Style>
+                                <TextAlign>Center</TextAlign>
+                              </Style>
+                            </Paragraph>
+                          </Paragraphs>
+                          <rd:DefaultName>Textbox11</rd:DefaultName>
+                          <Style>
+                            <Border>
+                              <Color>LightGrey</Color>
+                              <Style>Solid</Style>
+                            </Border>
+                            <BackgroundColor>#f86e00</BackgroundColor>
+                            <VerticalAlign>Middle</VerticalAlign>
+                            <PaddingLeft>2pt</PaddingLeft>
+                            <PaddingRight>2pt</PaddingRight>
+                            <PaddingTop>2pt</PaddingTop>
+                            <PaddingBottom>2pt</PaddingBottom>
+                          </Style>
+                        </Textbox>
+                      </CellContents>
+                    </TablixCell>
+                    <TablixCell>
+                      <CellContents>
+                        <Textbox Name="Textbox13">
+                          <CanGrow>true</CanGrow>
+                          <KeepTogether>true</KeepTogether>
+                          <Paragraphs>
+                            <Paragraph>
+                              <TextRuns>
+                                <TextRun>
+                                  <Value>Status</Value>
+                                  <Style>
+                                    <FontWeight>Bold</FontWeight>
+                                    <Color>White</Color>
+                                  </Style>
+                                </TextRun>
+                              </TextRuns>
+                              <Style>
+                                <TextAlign>Center</TextAlign>
+                              </Style>
+                            </Paragraph>
+                          </Paragraphs>
+                          <rd:DefaultName>Textbox13</rd:DefaultName>
+                          <Style>
+                            <Border>
+                              <Color>LightGrey</Color>
+                              <Style>Solid</Style>
+                            </Border>
+                            <BackgroundColor>#f86e00</BackgroundColor>
+                            <VerticalAlign>Middle</VerticalAlign>
+                            <PaddingLeft>2pt</PaddingLeft>
+                            <PaddingRight>2pt</PaddingRight>
+                            <PaddingTop>2pt</PaddingTop>
+                            <PaddingBottom>2pt</PaddingBottom>
+                          </Style>
+                        </Textbox>
+                      </CellContents>
+                    </TablixCell>
+                    <TablixCell>
+                      <CellContents>
+                        <Textbox Name="Textbox15">
+                          <CanGrow>true</CanGrow>
+                          <KeepTogether>true</KeepTogether>
+                          <Paragraphs>
+                            <Paragraph>
+                              <TextRuns>
+                                <TextRun>
+                                  <Value>Priority</Value>
+                                  <Style>
+                                    <FontWeight>Bold</FontWeight>
+                                    <Color>White</Color>
+                                  </Style>
+                                </TextRun>
+                              </TextRuns>
+                              <Style>
+                                <TextAlign>Center</TextAlign>
+                              </Style>
+                            </Paragraph>
+                          </Paragraphs>
+                          <rd:DefaultName>Textbox15</rd:DefaultName>
+                          <Style>
+                            <Border>
+                              <Color>LightGrey</Color>
+                              <Style>Solid</Style>
+                            </Border>
+                            <BackgroundColor>#f86e00</BackgroundColor>
+                            <VerticalAlign>Middle</VerticalAlign>
+                            <PaddingLeft>2pt</PaddingLeft>
+                            <PaddingRight>2pt</PaddingRight>
+                            <PaddingTop>2pt</PaddingTop>
+                            <PaddingBottom>2pt</PaddingBottom>
+                          </Style>
+                        </Textbox>
+                      </CellContents>
+                    </TablixCell>
+                    <TablixCell>
+                      <CellContents>
+                        <Textbox Name="Textbox17">
                           <CanGrow>true</CanGrow>
                           <KeepTogether>true</KeepTogether>
                           <Paragraphs>
@@ -297,7 +431,7 @@ WHERE
                               </Style>
                             </Paragraph>
                           </Paragraphs>
-                          <rd:DefaultName>Textbox5</rd:DefaultName>
+                          <rd:DefaultName>Textbox17</rd:DefaultName>
                           <Style>
                             <Border>
                               <Color>LightGrey</Color>
@@ -315,16 +449,15 @@ WHERE
                     </TablixCell>
                     <TablixCell>
                       <CellContents>
-                        <Textbox Name="Textbox8">
+                        <Textbox Name="Textbox19">
                           <CanGrow>true</CanGrow>
                           <KeepTogether>true</KeepTogether>
                           <Paragraphs>
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value>Priority</Value>
+                                  <Value>Notes</Value>
                                   <Style>
-                                    <FontFamily>Arial</FontFamily>
                                     <FontWeight>Bold</FontWeight>
                                     <Color>White</Color>
                                   </Style>
@@ -335,7 +468,7 @@ WHERE
                               </Style>
                             </Paragraph>
                           </Paragraphs>
-                          <rd:DefaultName>Textbox8</rd:DefaultName>
+                          <rd:DefaultName>Textbox19</rd:DefaultName>
                           <Style>
                             <Border>
                               <Color>LightGrey</Color>
@@ -353,273 +486,7 @@ WHERE
                     </TablixCell>
                     <TablixCell>
                       <CellContents>
-                        <Textbox Name="Textbox10">
-                          <CanGrow>true</CanGrow>
-                          <KeepTogether>true</KeepTogether>
-                          <Paragraphs>
-                            <Paragraph>
-                              <TextRuns>
-                                <TextRun>
-                                  <Value>Status</Value>
-                                  <Style>
-                                    <FontFamily>Arial</FontFamily>
-                                    <FontWeight>Bold</FontWeight>
-                                    <Color>White</Color>
-                                  </Style>
-                                </TextRun>
-                              </TextRuns>
-                              <Style>
-                                <TextAlign>Center</TextAlign>
-                              </Style>
-                            </Paragraph>
-                          </Paragraphs>
-                          <rd:DefaultName>Textbox10</rd:DefaultName>
-                          <Style>
-                            <Border>
-                              <Color>LightGrey</Color>
-                              <Style>Solid</Style>
-                            </Border>
-                            <BackgroundColor>#f86e00</BackgroundColor>
-                            <VerticalAlign>Middle</VerticalAlign>
-                            <PaddingLeft>2pt</PaddingLeft>
-                            <PaddingRight>2pt</PaddingRight>
-                            <PaddingTop>2pt</PaddingTop>
-                            <PaddingBottom>2pt</PaddingBottom>
-                          </Style>
-                        </Textbox>
-                      </CellContents>
-                    </TablixCell>
-                    <TablixCell>
-                      <CellContents>
-                        <Textbox Name="Textbox12">
-                          <CanGrow>true</CanGrow>
-                          <KeepTogether>true</KeepTogether>
-                          <Paragraphs>
-                            <Paragraph>
-                              <TextRuns>
-                                <TextRun>
-                                  <Value>Business Service</Value>
-                                  <Style>
-                                    <FontFamily>Arial</FontFamily>
-                                    <FontWeight>Bold</FontWeight>
-                                    <Color>White</Color>
-                                  </Style>
-                                </TextRun>
-                              </TextRuns>
-                              <Style>
-                                <TextAlign>Center</TextAlign>
-                              </Style>
-                            </Paragraph>
-                          </Paragraphs>
-                          <rd:DefaultName>Textbox12</rd:DefaultName>
-                          <Style>
-                            <Border>
-                              <Color>LightGrey</Color>
-                              <Style>Solid</Style>
-                            </Border>
-                            <BackgroundColor>#f86e00</BackgroundColor>
-                            <VerticalAlign>Middle</VerticalAlign>
-                            <PaddingLeft>2pt</PaddingLeft>
-                            <PaddingRight>2pt</PaddingRight>
-                            <PaddingTop>2pt</PaddingTop>
-                            <PaddingBottom>2pt</PaddingBottom>
-                          </Style>
-                        </Textbox>
-                      </CellContents>
-                    </TablixCell>
-                    <TablixCell>
-                      <CellContents>
-                        <Textbox Name="Textbox18">
-                          <CanGrow>true</CanGrow>
-                          <KeepTogether>true</KeepTogether>
-                          <Paragraphs>
-                            <Paragraph>
-                              <TextRuns>
-                                <TextRun>
-                                  <Value>Technical Service</Value>
-                                  <Style>
-                                    <FontFamily>Arial</FontFamily>
-                                    <FontWeight>Bold</FontWeight>
-                                    <Color>White</Color>
-                                  </Style>
-                                </TextRun>
-                              </TextRuns>
-                              <Style>
-                                <TextAlign>Center</TextAlign>
-                              </Style>
-                            </Paragraph>
-                          </Paragraphs>
-                          <rd:DefaultName>Textbox18</rd:DefaultName>
-                          <Style>
-                            <Border>
-                              <Color>LightGrey</Color>
-                              <Style>Solid</Style>
-                            </Border>
-                            <BackgroundColor>#f86e00</BackgroundColor>
-                            <VerticalAlign>Middle</VerticalAlign>
-                            <PaddingLeft>2pt</PaddingLeft>
-                            <PaddingRight>2pt</PaddingRight>
-                            <PaddingTop>2pt</PaddingTop>
-                            <PaddingBottom>2pt</PaddingBottom>
-                          </Style>
-                        </Textbox>
-                      </CellContents>
-                    </TablixCell>
-                    <TablixCell>
-                      <CellContents>
-                        <Textbox Name="Textbox14">
-                          <CanGrow>true</CanGrow>
-                          <KeepTogether>true</KeepTogether>
-                          <Paragraphs>
-                            <Paragraph>
-                              <TextRuns>
-                                <TextRun>
-                                  <Value>Actual Start Date</Value>
-                                  <Style>
-                                    <FontFamily>Arial</FontFamily>
-                                    <FontWeight>Bold</FontWeight>
-                                    <Color>White</Color>
-                                  </Style>
-                                </TextRun>
-                              </TextRuns>
-                              <Style>
-                                <TextAlign>Center</TextAlign>
-                              </Style>
-                            </Paragraph>
-                          </Paragraphs>
-                          <rd:DefaultName>Textbox14</rd:DefaultName>
-                          <Style>
-                            <Border>
-                              <Color>LightGrey</Color>
-                              <Style>Solid</Style>
-                            </Border>
-                            <BackgroundColor>#f86e00</BackgroundColor>
-                            <VerticalAlign>Middle</VerticalAlign>
-                            <PaddingLeft>2pt</PaddingLeft>
-                            <PaddingRight>2pt</PaddingRight>
-                            <PaddingTop>2pt</PaddingTop>
-                            <PaddingBottom>2pt</PaddingBottom>
-                          </Style>
-                        </Textbox>
-                      </CellContents>
-                    </TablixCell>
-                    <TablixCell>
-                      <CellContents>
-                        <Textbox Name="Textbox16">
-                          <CanGrow>true</CanGrow>
-                          <KeepTogether>true</KeepTogether>
-                          <Paragraphs>
-                            <Paragraph>
-                              <TextRuns>
-                                <TextRun>
-                                  <Value>Actual End Date</Value>
-                                  <Style>
-                                    <FontFamily>Arial</FontFamily>
-                                    <FontWeight>Bold</FontWeight>
-                                    <Color>White</Color>
-                                  </Style>
-                                </TextRun>
-                              </TextRuns>
-                              <Style>
-                                <TextAlign>Center</TextAlign>
-                              </Style>
-                            </Paragraph>
-                          </Paragraphs>
-                          <rd:DefaultName>Textbox16</rd:DefaultName>
-                          <Style>
-                            <Border>
-                              <Color>LightGrey</Color>
-                              <Style>Solid</Style>
-                            </Border>
-                            <BackgroundColor>#f86e00</BackgroundColor>
-                            <VerticalAlign>Middle</VerticalAlign>
-                            <PaddingLeft>2pt</PaddingLeft>
-                            <PaddingRight>2pt</PaddingRight>
-                            <PaddingTop>2pt</PaddingTop>
-                            <PaddingBottom>2pt</PaddingBottom>
-                          </Style>
-                        </Textbox>
-                      </CellContents>
-                    </TablixCell>
-                    <TablixCell>
-                      <CellContents>
-                        <Textbox Name="Textbox20">
-                          <CanGrow>true</CanGrow>
-                          <KeepTogether>true</KeepTogether>
-                          <Paragraphs>
-                            <Paragraph>
-                              <TextRuns>
-                                <TextRun>
-                                  <Value>Completed Date Time</Value>
-                                  <Style>
-                                    <FontFamily>Arial</FontFamily>
-                                    <FontWeight>Bold</FontWeight>
-                                    <Color>White</Color>
-                                  </Style>
-                                </TextRun>
-                              </TextRuns>
-                              <Style>
-                                <TextAlign>Center</TextAlign>
-                              </Style>
-                            </Paragraph>
-                          </Paragraphs>
-                          <rd:DefaultName>Textbox20</rd:DefaultName>
-                          <Style>
-                            <Border>
-                              <Color>LightGrey</Color>
-                              <Style>Solid</Style>
-                            </Border>
-                            <BackgroundColor>#f86e00</BackgroundColor>
-                            <VerticalAlign>Middle</VerticalAlign>
-                            <PaddingLeft>2pt</PaddingLeft>
-                            <PaddingRight>2pt</PaddingRight>
-                            <PaddingTop>2pt</PaddingTop>
-                            <PaddingBottom>2pt</PaddingBottom>
-                          </Style>
-                        </Textbox>
-                      </CellContents>
-                    </TablixCell>
-                    <TablixCell>
-                      <CellContents>
-                        <Textbox Name="Textbox34">
-                          <CanGrow>true</CanGrow>
-                          <KeepTogether>true</KeepTogether>
-                          <Paragraphs>
-                            <Paragraph>
-                              <TextRuns>
-                                <TextRun>
-                                  <Value>Support Company</Value>
-                                  <Style>
-                                    <FontFamily>Arial</FontFamily>
-                                    <FontWeight>Bold</FontWeight>
-                                    <Color>White</Color>
-                                  </Style>
-                                </TextRun>
-                              </TextRuns>
-                              <Style>
-                                <TextAlign>Center</TextAlign>
-                              </Style>
-                            </Paragraph>
-                          </Paragraphs>
-                          <rd:DefaultName>Textbox34</rd:DefaultName>
-                          <Style>
-                            <Border>
-                              <Color>LightGrey</Color>
-                              <Style>Solid</Style>
-                            </Border>
-                            <BackgroundColor>#f86e00</BackgroundColor>
-                            <VerticalAlign>Middle</VerticalAlign>
-                            <PaddingLeft>2pt</PaddingLeft>
-                            <PaddingRight>2pt</PaddingRight>
-                            <PaddingTop>2pt</PaddingTop>
-                            <PaddingBottom>2pt</PaddingBottom>
-                          </Style>
-                        </Textbox>
-                      </CellContents>
-                    </TablixCell>
-                    <TablixCell>
-                      <CellContents>
-                        <Textbox Name="Textbox32">
+                        <Textbox Name="Textbox21">
                           <CanGrow>true</CanGrow>
                           <KeepTogether>true</KeepTogether>
                           <Paragraphs>
@@ -628,7 +495,6 @@ WHERE
                                 <TextRun>
                                   <Value>Request Assignee Support Group</Value>
                                   <Style>
-                                    <FontFamily>Arial</FontFamily>
                                     <FontWeight>Bold</FontWeight>
                                     <Color>White</Color>
                                   </Style>
@@ -639,7 +505,7 @@ WHERE
                               </Style>
                             </Paragraph>
                           </Paragraphs>
-                          <rd:DefaultName>Textbox32</rd:DefaultName>
+                          <rd:DefaultName>Textbox21</rd:DefaultName>
                           <Style>
                             <Border>
                               <Color>LightGrey</Color>
@@ -657,83 +523,7 @@ WHERE
                     </TablixCell>
                     <TablixCell>
                       <CellContents>
-                        <Textbox Name="Textbox30">
-                          <CanGrow>true</CanGrow>
-                          <KeepTogether>true</KeepTogether>
-                          <Paragraphs>
-                            <Paragraph>
-                              <TextRuns>
-                                <TextRun>
-                                  <Value>Request Manager Support Organization</Value>
-                                  <Style>
-                                    <FontFamily>Arial</FontFamily>
-                                    <FontWeight>Bold</FontWeight>
-                                    <Color>White</Color>
-                                  </Style>
-                                </TextRun>
-                              </TextRuns>
-                              <Style>
-                                <TextAlign>Center</TextAlign>
-                              </Style>
-                            </Paragraph>
-                          </Paragraphs>
-                          <rd:DefaultName>Textbox30</rd:DefaultName>
-                          <Style>
-                            <Border>
-                              <Color>LightGrey</Color>
-                              <Style>Solid</Style>
-                            </Border>
-                            <BackgroundColor>#f86e00</BackgroundColor>
-                            <VerticalAlign>Middle</VerticalAlign>
-                            <PaddingLeft>2pt</PaddingLeft>
-                            <PaddingRight>2pt</PaddingRight>
-                            <PaddingTop>2pt</PaddingTop>
-                            <PaddingBottom>2pt</PaddingBottom>
-                          </Style>
-                        </Textbox>
-                      </CellContents>
-                    </TablixCell>
-                    <TablixCell>
-                      <CellContents>
-                        <Textbox Name="Textbox28">
-                          <CanGrow>true</CanGrow>
-                          <KeepTogether>true</KeepTogether>
-                          <Paragraphs>
-                            <Paragraph>
-                              <TextRuns>
-                                <TextRun>
-                                  <Value>Request Manager Support Group</Value>
-                                  <Style>
-                                    <FontFamily>Arial</FontFamily>
-                                    <FontWeight>Bold</FontWeight>
-                                    <Color>White</Color>
-                                  </Style>
-                                </TextRun>
-                              </TextRuns>
-                              <Style>
-                                <TextAlign>Center</TextAlign>
-                              </Style>
-                            </Paragraph>
-                          </Paragraphs>
-                          <rd:DefaultName>Textbox28</rd:DefaultName>
-                          <Style>
-                            <Border>
-                              <Color>LightGrey</Color>
-                              <Style>Solid</Style>
-                            </Border>
-                            <BackgroundColor>#f86e00</BackgroundColor>
-                            <VerticalAlign>Middle</VerticalAlign>
-                            <PaddingLeft>2pt</PaddingLeft>
-                            <PaddingRight>2pt</PaddingRight>
-                            <PaddingTop>2pt</PaddingTop>
-                            <PaddingBottom>2pt</PaddingBottom>
-                          </Style>
-                        </Textbox>
-                      </CellContents>
-                    </TablixCell>
-                    <TablixCell>
-                      <CellContents>
-                        <Textbox Name="Textbox26">
+                        <Textbox Name="Textbox5">
                           <CanGrow>true</CanGrow>
                           <KeepTogether>true</KeepTogether>
                           <Paragraphs>
@@ -742,7 +532,6 @@ WHERE
                                 <TextRun>
                                   <Value>Assignee ID</Value>
                                   <Style>
-                                    <FontFamily>Arial</FontFamily>
                                     <FontWeight>Bold</FontWeight>
                                     <Color>White</Color>
                                   </Style>
@@ -753,45 +542,7 @@ WHERE
                               </Style>
                             </Paragraph>
                           </Paragraphs>
-                          <rd:DefaultName>Textbox26</rd:DefaultName>
-                          <Style>
-                            <Border>
-                              <Color>LightGrey</Color>
-                              <Style>Solid</Style>
-                            </Border>
-                            <BackgroundColor>#f86e00</BackgroundColor>
-                            <VerticalAlign>Middle</VerticalAlign>
-                            <PaddingLeft>2pt</PaddingLeft>
-                            <PaddingRight>2pt</PaddingRight>
-                            <PaddingTop>2pt</PaddingTop>
-                            <PaddingBottom>2pt</PaddingBottom>
-                          </Style>
-                        </Textbox>
-                      </CellContents>
-                    </TablixCell>
-                    <TablixCell>
-                      <CellContents>
-                        <Textbox Name="Textbox24">
-                          <CanGrow>true</CanGrow>
-                          <KeepTogether>true</KeepTogether>
-                          <Paragraphs>
-                            <Paragraph>
-                              <TextRuns>
-                                <TextRun>
-                                  <Value>Submit Date</Value>
-                                  <Style>
-                                    <FontFamily>Arial</FontFamily>
-                                    <FontWeight>Bold</FontWeight>
-                                    <Color>White</Color>
-                                  </Style>
-                                </TextRun>
-                              </TextRuns>
-                              <Style>
-                                <TextAlign>Center</TextAlign>
-                              </Style>
-                            </Paragraph>
-                          </Paragraphs>
-                          <rd:DefaultName>Textbox24</rd:DefaultName>
+                          <rd:DefaultName>Textbox5</rd:DefaultName>
                           <Style>
                             <Border>
                               <Color>LightGrey</Color>
@@ -824,7 +575,9 @@ WHERE
                                   <Style />
                                 </TextRun>
                               </TextRuns>
-                              <Style />
+                              <Style>
+                                <TextAlign>Left</TextAlign>
+                              </Style>
                             </Paragraph>
                           </Paragraphs>
                           <rd:DefaultName>Work_Order_ID</rd:DefaultName>
@@ -844,244 +597,24 @@ WHERE
                     </TablixCell>
                     <TablixCell>
                       <CellContents>
-                        <Textbox Name="Week_Of_Year">
+                        <Textbox Name="Submit_Date">
                           <KeepTogether>true</KeepTogether>
                           <Paragraphs>
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value>=Fields!Week_Of_Year.Value</Value>
-                                  <Style />
-                                </TextRun>
-                              </TextRuns>
-                              <Style />
-                            </Paragraph>
-                          </Paragraphs>
-                          <rd:DefaultName>Week_Of_Year</rd:DefaultName>
-                          <Style>
-                            <Border>
-                              <Color>LightGrey</Color>
-                              <Style>Solid</Style>
-                            </Border>
-                            <BackgroundColor>=IIF(ROWNUMBER(NOTHING) MOD 2, "#FBE4D6", "Transparent")</BackgroundColor>
-                            <PaddingLeft>2pt</PaddingLeft>
-                            <PaddingRight>2pt</PaddingRight>
-                            <PaddingTop>2pt</PaddingTop>
-                            <PaddingBottom>2pt</PaddingBottom>
-                          </Style>
-                        </Textbox>
-                      </CellContents>
-                    </TablixCell>
-                    <TablixCell>
-                      <CellContents>
-                        <Textbox Name="Summary">
-                          <KeepTogether>true</KeepTogether>
-                          <Paragraphs>
-                            <Paragraph>
-                              <TextRuns>
-                                <TextRun>
-                                  <Value>=Fields!Summary.Value</Value>
-                                  <Style />
-                                </TextRun>
-                              </TextRuns>
-                              <Style />
-                            </Paragraph>
-                          </Paragraphs>
-                          <rd:DefaultName>Summary</rd:DefaultName>
-                          <Style>
-                            <Border>
-                              <Color>LightGrey</Color>
-                              <Style>Solid</Style>
-                            </Border>
-                            <BackgroundColor>=IIF(ROWNUMBER(NOTHING) MOD 2, "#FBE4D6", "Transparent")</BackgroundColor>
-                            <PaddingLeft>2pt</PaddingLeft>
-                            <PaddingRight>2pt</PaddingRight>
-                            <PaddingTop>2pt</PaddingTop>
-                            <PaddingBottom>2pt</PaddingBottom>
-                          </Style>
-                        </Textbox>
-                      </CellContents>
-                    </TablixCell>
-                    <TablixCell>
-                      <CellContents>
-                        <Textbox Name="Priority">
-                          <KeepTogether>true</KeepTogether>
-                          <Paragraphs>
-                            <Paragraph>
-                              <TextRuns>
-                                <TextRun>
-                                  <Value>=Fields!Priority.Value</Value>
+                                  <Value>=Fields!Submit_Date.Value</Value>
                                   <Style>
-                                    <FontFamily>Arial</FontFamily>
-                                  </Style>
-                                </TextRun>
-                              </TextRuns>
-                              <Style />
-                            </Paragraph>
-                          </Paragraphs>
-                          <rd:DefaultName>Priority</rd:DefaultName>
-                          <Style>
-                            <Border>
-                              <Color>LightGrey</Color>
-                              <Style>Solid</Style>
-                            </Border>
-                            <BackgroundColor>=IIF(ROWNUMBER(NOTHING) MOD 2, "#FBE4D6", "Transparent")</BackgroundColor>
-                            <PaddingLeft>2pt</PaddingLeft>
-                            <PaddingRight>2pt</PaddingRight>
-                            <PaddingTop>2pt</PaddingTop>
-                            <PaddingBottom>2pt</PaddingBottom>
-                          </Style>
-                        </Textbox>
-                      </CellContents>
-                    </TablixCell>
-                    <TablixCell>
-                      <CellContents>
-                        <Textbox Name="Status">
-                          <KeepTogether>true</KeepTogether>
-                          <Paragraphs>
-                            <Paragraph>
-                              <TextRuns>
-                                <TextRun>
-                                  <Value>=Fields!Status.Value</Value>
-                                  <Style>
-                                    <FontFamily>Arial</FontFamily>
-                                  </Style>
-                                </TextRun>
-                              </TextRuns>
-                              <Style />
-                            </Paragraph>
-                          </Paragraphs>
-                          <rd:DefaultName>Status</rd:DefaultName>
-                          <Style>
-                            <Border>
-                              <Color>LightGrey</Color>
-                              <Style>Solid</Style>
-                            </Border>
-                            <BackgroundColor>=IIF(ROWNUMBER(NOTHING) MOD 2, "#FBE4D6", "Transparent")</BackgroundColor>
-                            <PaddingLeft>2pt</PaddingLeft>
-                            <PaddingRight>2pt</PaddingRight>
-                            <PaddingTop>2pt</PaddingTop>
-                            <PaddingBottom>2pt</PaddingBottom>
-                          </Style>
-                        </Textbox>
-                      </CellContents>
-                    </TablixCell>
-                    <TablixCell>
-                      <CellContents>
-                        <Textbox Name="Business_Service">
-                          <KeepTogether>true</KeepTogether>
-                          <Paragraphs>
-                            <Paragraph>
-                              <TextRuns>
-                                <TextRun>
-                                  <Value>=Fields!Business_Service.Value</Value>
-                                  <Style>
-                                    <FontFamily>Arial</FontFamily>
-                                  </Style>
-                                </TextRun>
-                              </TextRuns>
-                              <Style />
-                            </Paragraph>
-                          </Paragraphs>
-                          <rd:DefaultName>Business_Service</rd:DefaultName>
-                          <Style>
-                            <Border>
-                              <Color>LightGrey</Color>
-                              <Style>Solid</Style>
-                            </Border>
-                            <BackgroundColor>=IIF(ROWNUMBER(NOTHING) MOD 2, "#FBE4D6", "Transparent")</BackgroundColor>
-                            <PaddingLeft>2pt</PaddingLeft>
-                            <PaddingRight>2pt</PaddingRight>
-                            <PaddingTop>2pt</PaddingTop>
-                            <PaddingBottom>2pt</PaddingBottom>
-                          </Style>
-                        </Textbox>
-                      </CellContents>
-                    </TablixCell>
-                    <TablixCell>
-                      <CellContents>
-                        <Textbox Name="WO_TS__c">
-                          <KeepTogether>true</KeepTogether>
-                          <Paragraphs>
-                            <Paragraph>
-                              <TextRuns>
-                                <TextRun>
-                                  <Value>=Fields!WO_TS__c.Value</Value>
-                                  <Style>
-                                    <FontFamily>Arial</FontFamily>
-                                  </Style>
-                                </TextRun>
-                              </TextRuns>
-                              <Style />
-                            </Paragraph>
-                          </Paragraphs>
-                          <rd:DefaultName>WO_TS__c</rd:DefaultName>
-                          <Style>
-                            <Border>
-                              <Color>LightGrey</Color>
-                              <Style>Solid</Style>
-                            </Border>
-                            <BackgroundColor>=IIF(ROWNUMBER(NOTHING) MOD 2, "#FBE4D6", "Transparent")</BackgroundColor>
-                            <PaddingLeft>2pt</PaddingLeft>
-                            <PaddingRight>2pt</PaddingRight>
-                            <PaddingTop>2pt</PaddingTop>
-                            <PaddingBottom>2pt</PaddingBottom>
-                          </Style>
-                        </Textbox>
-                      </CellContents>
-                    </TablixCell>
-                    <TablixCell>
-                      <CellContents>
-                        <Textbox Name="Start_Date">
-                          <KeepTogether>true</KeepTogether>
-                          <Paragraphs>
-                            <Paragraph>
-                              <TextRuns>
-                                <TextRun>
-                                  <Value>=Fields!Start_Date.Value</Value>
-                                  <Style>
-                                    <FontFamily>Arial</FontFamily>
                                     <Format>dd/MM/yyyy HH:mm</Format>
                                   </Style>
                                 </TextRun>
                               </TextRuns>
-                              <Style />
+                              <Style>
+                                <TextAlign>Left</TextAlign>
+                              </Style>
                             </Paragraph>
                           </Paragraphs>
-                          <rd:DefaultName>Start_Date</rd:DefaultName>
-                          <Style>
-                            <Border>
-                              <Color>LightGrey</Color>
-                              <Style>Solid</Style>
-                            </Border>
-                            <BackgroundColor>=IIF(ROWNUMBER(NOTHING) MOD 2, "#FBE4D6", "Transparent")</BackgroundColor>
-                            <PaddingLeft>2pt</PaddingLeft>
-                            <PaddingRight>2pt</PaddingRight>
-                            <PaddingTop>2pt</PaddingTop>
-                            <PaddingBottom>2pt</PaddingBottom>
-                          </Style>
-                        </Textbox>
-                      </CellContents>
-                    </TablixCell>
-                    <TablixCell>
-                      <CellContents>
-                        <Textbox Name="End_Date">
-                          <KeepTogether>true</KeepTogether>
-                          <Paragraphs>
-                            <Paragraph>
-                              <TextRuns>
-                                <TextRun>
-                                  <Value>=Fields!End_Date.Value</Value>
-                                  <Style>
-                                    <FontFamily>Arial</FontFamily>
-                                    <Format>dd/MM/yyyy HH:mm</Format>
-                                  </Style>
-                                </TextRun>
-                              </TextRuns>
-                              <Style />
-                            </Paragraph>
-                          </Paragraphs>
-                          <rd:DefaultName>End_Date</rd:DefaultName>
+                          <rd:DefaultName>Submit_Date</rd:DefaultName>
                           <Style>
                             <Border>
                               <Color>LightGrey</Color>
@@ -1111,7 +644,9 @@ WHERE
                                   </Style>
                                 </TextRun>
                               </TextRuns>
-                              <Style />
+                              <Style>
+                                <TextAlign>Left</TextAlign>
+                              </Style>
                             </Paragraph>
                           </Paragraphs>
                           <rd:DefaultName>Completed_Date</rd:DefaultName>
@@ -1131,22 +666,194 @@ WHERE
                     </TablixCell>
                     <TablixCell>
                       <CellContents>
-                        <Textbox Name="Assigned_Support_Company">
+                        <Textbox Name="First_Name">
                           <KeepTogether>true</KeepTogether>
                           <Paragraphs>
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value>=Fields!Assigned_Support_Company.Value</Value>
+                                  <Value>=Fields!First_Name.Value</Value>
                                   <Style>
                                     <FontFamily>Arial</FontFamily>
                                   </Style>
                                 </TextRun>
                               </TextRuns>
-                              <Style />
+                              <Style>
+                                <TextAlign>Left</TextAlign>
+                              </Style>
                             </Paragraph>
                           </Paragraphs>
-                          <rd:DefaultName>Assigned_Support_Company</rd:DefaultName>
+                          <rd:DefaultName>First_Name</rd:DefaultName>
+                          <Style>
+                            <Border>
+                              <Color>LightGrey</Color>
+                              <Style>Solid</Style>
+                            </Border>
+                            <BackgroundColor>=IIF(ROWNUMBER(NOTHING) MOD 2, "#FBE4D6", "Transparent")</BackgroundColor>
+                            <PaddingLeft>2pt</PaddingLeft>
+                            <PaddingRight>2pt</PaddingRight>
+                            <PaddingTop>2pt</PaddingTop>
+                            <PaddingBottom>2pt</PaddingBottom>
+                          </Style>
+                        </Textbox>
+                      </CellContents>
+                    </TablixCell>
+                    <TablixCell>
+                      <CellContents>
+                        <Textbox Name="Last_Name">
+                          <KeepTogether>true</KeepTogether>
+                          <Paragraphs>
+                            <Paragraph>
+                              <TextRuns>
+                                <TextRun>
+                                  <Value>=Fields!Last_Name.Value</Value>
+                                  <Style>
+                                    <FontFamily>Arial</FontFamily>
+                                  </Style>
+                                </TextRun>
+                              </TextRuns>
+                              <Style>
+                                <TextAlign>Left</TextAlign>
+                              </Style>
+                            </Paragraph>
+                          </Paragraphs>
+                          <rd:DefaultName>Last_Name</rd:DefaultName>
+                          <Style>
+                            <Border>
+                              <Color>LightGrey</Color>
+                              <Style>Solid</Style>
+                            </Border>
+                            <BackgroundColor>=IIF(ROWNUMBER(NOTHING) MOD 2, "#FBE4D6", "Transparent")</BackgroundColor>
+                            <PaddingLeft>2pt</PaddingLeft>
+                            <PaddingRight>2pt</PaddingRight>
+                            <PaddingTop>2pt</PaddingTop>
+                            <PaddingBottom>2pt</PaddingBottom>
+                          </Style>
+                        </Textbox>
+                      </CellContents>
+                    </TablixCell>
+                    <TablixCell>
+                      <CellContents>
+                        <Textbox Name="Status">
+                          <KeepTogether>true</KeepTogether>
+                          <Paragraphs>
+                            <Paragraph>
+                              <TextRuns>
+                                <TextRun>
+                                  <Value>=Fields!Status.Value</Value>
+                                  <Style>
+                                    <FontFamily>Arial</FontFamily>
+                                  </Style>
+                                </TextRun>
+                              </TextRuns>
+                              <Style>
+                                <TextAlign>Left</TextAlign>
+                              </Style>
+                            </Paragraph>
+                          </Paragraphs>
+                          <rd:DefaultName>Status</rd:DefaultName>
+                          <Style>
+                            <Border>
+                              <Color>LightGrey</Color>
+                              <Style>Solid</Style>
+                            </Border>
+                            <BackgroundColor>=IIF(ROWNUMBER(NOTHING) MOD 2, "#FBE4D6", "Transparent")</BackgroundColor>
+                            <PaddingLeft>2pt</PaddingLeft>
+                            <PaddingRight>2pt</PaddingRight>
+                            <PaddingTop>2pt</PaddingTop>
+                            <PaddingBottom>2pt</PaddingBottom>
+                          </Style>
+                        </Textbox>
+                      </CellContents>
+                    </TablixCell>
+                    <TablixCell>
+                      <CellContents>
+                        <Textbox Name="Priority">
+                          <KeepTogether>true</KeepTogether>
+                          <Paragraphs>
+                            <Paragraph>
+                              <TextRuns>
+                                <TextRun>
+                                  <Value>=Fields!Priority.Value</Value>
+                                  <Style>
+                                    <FontFamily>Arial</FontFamily>
+                                  </Style>
+                                </TextRun>
+                              </TextRuns>
+                              <Style>
+                                <TextAlign>Left</TextAlign>
+                              </Style>
+                            </Paragraph>
+                          </Paragraphs>
+                          <rd:DefaultName>Priority</rd:DefaultName>
+                          <Style>
+                            <Border>
+                              <Color>LightGrey</Color>
+                              <Style>Solid</Style>
+                            </Border>
+                            <BackgroundColor>=IIF(ROWNUMBER(NOTHING) MOD 2, "#FBE4D6", "Transparent")</BackgroundColor>
+                            <PaddingLeft>2pt</PaddingLeft>
+                            <PaddingRight>2pt</PaddingRight>
+                            <PaddingTop>2pt</PaddingTop>
+                            <PaddingBottom>2pt</PaddingBottom>
+                          </Style>
+                        </Textbox>
+                      </CellContents>
+                    </TablixCell>
+                    <TablixCell>
+                      <CellContents>
+                        <Textbox Name="Summary">
+                          <KeepTogether>true</KeepTogether>
+                          <Paragraphs>
+                            <Paragraph>
+                              <TextRuns>
+                                <TextRun>
+                                  <Value>=Fields!Summary.Value</Value>
+                                  <Style>
+                                    <FontFamily>Arial</FontFamily>
+                                  </Style>
+                                </TextRun>
+                              </TextRuns>
+                              <Style>
+                                <TextAlign>Left</TextAlign>
+                              </Style>
+                            </Paragraph>
+                          </Paragraphs>
+                          <rd:DefaultName>Summary</rd:DefaultName>
+                          <Style>
+                            <Border>
+                              <Color>LightGrey</Color>
+                              <Style>Solid</Style>
+                            </Border>
+                            <BackgroundColor>=IIF(ROWNUMBER(NOTHING) MOD 2, "#FBE4D6", "Transparent")</BackgroundColor>
+                            <PaddingLeft>2pt</PaddingLeft>
+                            <PaddingRight>2pt</PaddingRight>
+                            <PaddingTop>2pt</PaddingTop>
+                            <PaddingBottom>2pt</PaddingBottom>
+                          </Style>
+                        </Textbox>
+                      </CellContents>
+                    </TablixCell>
+                    <TablixCell>
+                      <CellContents>
+                        <Textbox Name="details">
+                          <KeepTogether>true</KeepTogether>
+                          <Paragraphs>
+                            <Paragraph>
+                              <TextRuns>
+                                <TextRun>
+                                  <Value>=Fields!details.Value</Value>
+                                  <Style>
+                                    <FontFamily>Arial</FontFamily>
+                                  </Style>
+                                </TextRun>
+                              </TextRuns>
+                              <Style>
+                                <TextAlign>Left</TextAlign>
+                              </Style>
+                            </Paragraph>
+                          </Paragraphs>
+                          <rd:DefaultName>details</rd:DefaultName>
                           <Style>
                             <Border>
                               <Color>LightGrey</Color>
@@ -1175,74 +882,12 @@ WHERE
                                   </Style>
                                 </TextRun>
                               </TextRuns>
-                              <Style />
+                              <Style>
+                                <TextAlign>Left</TextAlign>
+                              </Style>
                             </Paragraph>
                           </Paragraphs>
                           <rd:DefaultName>ASGRP</rd:DefaultName>
-                          <Style>
-                            <Border>
-                              <Color>LightGrey</Color>
-                              <Style>Solid</Style>
-                            </Border>
-                            <BackgroundColor>=IIF(ROWNUMBER(NOTHING) MOD 2, "#FBE4D6", "Transparent")</BackgroundColor>
-                            <PaddingLeft>2pt</PaddingLeft>
-                            <PaddingRight>2pt</PaddingRight>
-                            <PaddingTop>2pt</PaddingTop>
-                            <PaddingBottom>2pt</PaddingBottom>
-                          </Style>
-                        </Textbox>
-                      </CellContents>
-                    </TablixCell>
-                    <TablixCell>
-                      <CellContents>
-                        <Textbox Name="Support_Organization">
-                          <KeepTogether>true</KeepTogether>
-                          <Paragraphs>
-                            <Paragraph>
-                              <TextRuns>
-                                <TextRun>
-                                  <Value>=Fields!Support_Organization.Value</Value>
-                                  <Style>
-                                    <FontFamily>Arial</FontFamily>
-                                  </Style>
-                                </TextRun>
-                              </TextRuns>
-                              <Style />
-                            </Paragraph>
-                          </Paragraphs>
-                          <rd:DefaultName>Support_Organization</rd:DefaultName>
-                          <Style>
-                            <Border>
-                              <Color>LightGrey</Color>
-                              <Style>Solid</Style>
-                            </Border>
-                            <BackgroundColor>=IIF(ROWNUMBER(NOTHING) MOD 2, "#FBE4D6", "Transparent")</BackgroundColor>
-                            <PaddingLeft>2pt</PaddingLeft>
-                            <PaddingRight>2pt</PaddingRight>
-                            <PaddingTop>2pt</PaddingTop>
-                            <PaddingBottom>2pt</PaddingBottom>
-                          </Style>
-                        </Textbox>
-                      </CellContents>
-                    </TablixCell>
-                    <TablixCell>
-                      <CellContents>
-                        <Textbox Name="Support_Group_Name">
-                          <KeepTogether>true</KeepTogether>
-                          <Paragraphs>
-                            <Paragraph>
-                              <TextRuns>
-                                <TextRun>
-                                  <Value>=Fields!Support_Group_Name.Value</Value>
-                                  <Style>
-                                    <FontFamily>Arial</FontFamily>
-                                  </Style>
-                                </TextRun>
-                              </TextRuns>
-                              <Style />
-                            </Paragraph>
-                          </Paragraphs>
-                          <rd:DefaultName>Support_Group_Name</rd:DefaultName>
                           <Style>
                             <Border>
                               <Color>LightGrey</Color>
@@ -1266,48 +911,15 @@ WHERE
                               <TextRuns>
                                 <TextRun>
                                   <Value>=Fields!ASLOGID.Value</Value>
-                                  <Style>
-                                    <FontFamily>Arial</FontFamily>
-                                  </Style>
+                                  <Style />
                                 </TextRun>
                               </TextRuns>
-                              <Style />
+                              <Style>
+                                <TextAlign>Left</TextAlign>
+                              </Style>
                             </Paragraph>
                           </Paragraphs>
                           <rd:DefaultName>ASLOGID</rd:DefaultName>
-                          <Style>
-                            <Border>
-                              <Color>LightGrey</Color>
-                              <Style>Solid</Style>
-                            </Border>
-                            <BackgroundColor>=IIF(ROWNUMBER(NOTHING) MOD 2, "#FBE4D6", "Transparent")</BackgroundColor>
-                            <PaddingLeft>2pt</PaddingLeft>
-                            <PaddingRight>2pt</PaddingRight>
-                            <PaddingTop>2pt</PaddingTop>
-                            <PaddingBottom>2pt</PaddingBottom>
-                          </Style>
-                        </Textbox>
-                      </CellContents>
-                    </TablixCell>
-                    <TablixCell>
-                      <CellContents>
-                        <Textbox Name="Submit_Date">
-                          <KeepTogether>true</KeepTogether>
-                          <Paragraphs>
-                            <Paragraph>
-                              <TextRuns>
-                                <TextRun>
-                                  <Value>=Fields!Submit_Date.Value</Value>
-                                  <Style>
-                                    <FontFamily>Arial</FontFamily>
-                                    <Format>dd/MM/yyyy HH:mm</Format>
-                                  </Style>
-                                </TextRun>
-                              </TextRuns>
-                              <Style />
-                            </Paragraph>
-                          </Paragraphs>
-                          <rd:DefaultName>Submit_Date</rd:DefaultName>
                           <Style>
                             <Border>
                               <Color>LightGrey</Color>
@@ -1339,11 +951,6 @@ WHERE
                 <TablixMember />
                 <TablixMember />
                 <TablixMember />
-                <TablixMember />
-                <TablixMember />
-                <TablixMember />
-                <TablixMember />
-                <TablixMember />
               </TablixMembers>
             </TablixColumnHierarchy>
             <TablixRowHierarchy>
@@ -1357,11 +964,11 @@ WHERE
               </TablixMembers>
             </TablixRowHierarchy>
             <DataSetName>a1telekom_prd_ar</DataSetName>
-            <PageName>WO_Weekly_Export_Bata_Open</PageName>
+            <PageName>Workorder_RAN_Operations</PageName>
             <Top>0mm</Top>
             <Left>0mm</Left>
             <Height>12mm</Height>
-            <Width>855.45836mm</Width>
+            <Width>562.27848mm</Width>
             <Style>
               <Border>
                 <Style>None</Style>
@@ -1376,7 +983,7 @@ WHERE
           </Border>
         </Style>
       </Body>
-      <Width>861.80836mm</Width>
+      <Width>562.27848mm</Width>
       <Page>
         <PageFooter>
           <Height>11.43mm</Height>
@@ -1388,12 +995,12 @@ WHERE
             </Border>
           </Style>
         </PageFooter>
-        <PageHeight>29.7cm</PageHeight>
-        <PageWidth>21cm</PageWidth>
-        <LeftMargin>2cm</LeftMargin>
-        <RightMargin>2cm</RightMargin>
-        <TopMargin>2cm</TopMargin>
-        <BottomMargin>2cm</BottomMargin>
+        <PageHeight>297mm</PageHeight>
+        <PageWidth>210mm</PageWidth>
+        <LeftMargin>20mm</LeftMargin>
+        <RightMargin>20mm</RightMargin>
+        <TopMargin>20mm</TopMargin>
+        <BottomMargin>20mm</BottomMargin>
         <ColumnSpacing>0.13cm</ColumnSpacing>
         <Style />
       </Page>
@@ -1407,5 +1014,5 @@ WHERE
   </ReportParametersLayout>
   <rd:ReportUnitType>Mm</rd:ReportUnitType>
   <rd:ReportServerUrl>http://10.250.235.177/ReportServer</rd:ReportServerUrl>
-  <rd:ReportID>7c07946c-9eaa-4537-af56-d3f05fc716a0</rd:ReportID>
+  <rd:ReportID>2de562fe-a684-436d-be1b-ce6681130c39</rd:ReportID>
 </Report>

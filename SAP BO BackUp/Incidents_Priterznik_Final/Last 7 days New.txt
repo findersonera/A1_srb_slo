@@ -67,3 +67,5 @@ WHERE
    AND
    HPD_HELP_DESK.Assigned_Group   IN  ( 'Backend & Billing_Integration(ESB)_slo','Backend & Billing_Payment_slo','Backend & Billing_Postpaid_slo','Backend & Billing_Provisioning_slo','CFS_CRM_slo','CFS_VAS&Portals_slo','IT Support_Fix_slo','CFS_EPI_slo','CFS_DMS_slo','CFS_FMS_slo','CFS_Wincash_slo'  )
   )
+
+

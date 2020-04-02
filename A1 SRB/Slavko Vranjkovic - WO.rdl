@@ -6,76 +6,58 @@
     <DataSource Name="a1telekom_prd_ar">
       <DataSourceReference>/a1telekom_prd_ar</DataSourceReference>
       <rd:SecurityType>None</rd:SecurityType>
-      <rd:DataSourceID>4e967a96-1645-41d1-9750-2bf8ac643734</rd:DataSourceID>
+      <rd:DataSourceID>7d6ff7ba-e309-4fc7-80d3-69c58ddae844</rd:DataSourceID>
     </DataSource>
   </DataSources>
   <DataSets>
     <DataSet Name="a1telekom_prd_ar">
       <Query>
         <DataSourceName>a1telekom_prd_ar</DataSourceName>
-        <CommandText>SELECT
-  SRM_WOI_WORKORDER.Work_Order_ID,
-  SRM_WOI_WORKORDER.Summary,
-  SRM_WOI_WORKORDER.Detailed_Description,
-  SRM_WO_STATUS.Status,
-  SRM_WO_PRIORITY.Priority,
-  SRM_WOI_WORKORDER.Submitter,
-  dbo.fn_adjusted_date(SRM_WOI_WORKORDER.Submit_Date) as Submit_Date,
-  SRM_WOI_WORKORDER.ASGRP,
-  dbo.fn_adjusted_date(SRM_WOI_WORKORDER.Completed_Date) as Completed_Date
-FROM
-
-SRM_WOI_WORKORDER
-left outer join SRM_WO_STATUS
-on SRM_WOI_WORKORDER.[Status] = SRM_WO_STATUS.ENUMID
-left outer join SRM_WO_PRIORITY 
-on SRM_WOI_WORKORDER.Priority = SRM_WO_PRIORITY.ENUMID
-
-WHERE
-  (
-   dbo.fn_adjusted_date(SRM_WOI_WORKORDER.Submit_Date)  BETWEEN  '12/15/2018 00:0:0'  AND  getdate()
-   AND
-   SRM_WOI_WORKORDER.ASGRP  IN  ( 'Backend &amp; Billing_ADX_PC_Development_srb','Backend &amp; Billing_Mediation','BS &amp; DS_Billing Prepaid','BSS Service Delivery_Prepaid','CFS_CSO_srb','CNS, IP &amp; IT_M2M APN_srb','CS_Technical Support_srb','IT &amp; SP &amp; Delivery_Test Center_srb','IT Infra_Helpdesk_srb','NP_RNPO_srb','NW Construction_Implementation_srb','NW Operations_RNO_srb','PC &amp; Services_Messaging_srb','PC &amp; Services_Roaming_srb','QA_Reporting &amp; Processes','Backend &amp; Billing_Postpaid_srb','Backend &amp; Billing_Provisioning_srb','Backend &amp; Billing_R&amp;I_srb','BSS Service Delivery_Postpaid_srb','Core NW_IN VPN','Core NW_srb','Core NW_Voice_srb','Customer Service Desk_srb','Employee Service Desk_srb','IP Network_srb','IT &amp; SP &amp; Delivery_srb','IT_Infra_srb','NP_TNP_srb','NW Construction_srb','NW Operations_TNO_srb','PC &amp; Services_Data_srb','PC &amp; Services_PCRF_srb','QA_Quality','SC &amp; IS_Internal Services_srb'  )
-  )
-
-order by SRM_WOI_WORKORDER.Submit_Date</CommandText>
+        <CommandText>SELECT srm_woi_workorder.work_order_id, 
+       srm_woi_workorder.summary, 
+       srm_woi_workorder.detailed_description, 
+       srm_wo_status.status, 
+       srm_wo_priority.priority, 
+       dbo.Fn_adjusted_date(srm_woi_workorder.submit_date) AS Submit_Date, 
+       srm_woi_workorder.asgrp 
+FROM   srm_woi_workorder 
+       LEFT OUTER JOIN srm_wo_status 
+                    ON srm_woi_workorder.status = srm_wo_status.enumid 
+       LEFT OUTER JOIN srm_wo_priority 
+                    ON srm_woi_workorder.priority = srm_wo_priority.enumid 
+WHERE  ( dbo.Fn_adjusted_date(srm_woi_workorder.submit_date) BETWEEN 
+                  '01/01/2019 00:0:0' AND getdate()
+         AND srm_woi_workorder.asgrp IN ( 'CFS_CSO_srb', 'CFS_MNP_srb' ) ) 
+ORDER  BY submit_date </CommandText>
       </Query>
       <Fields>
-        <Field Name="Work_Order_ID">
-          <DataField>Work_Order_ID</DataField>
+        <Field Name="work_order_id">
+          <DataField>work_order_id</DataField>
           <rd:TypeName>System.String</rd:TypeName>
         </Field>
-        <Field Name="Summary">
-          <DataField>Summary</DataField>
+        <Field Name="summary">
+          <DataField>summary</DataField>
           <rd:TypeName>System.String</rd:TypeName>
         </Field>
-        <Field Name="Detailed_Description">
-          <DataField>Detailed_Description</DataField>
+        <Field Name="detailed_description">
+          <DataField>detailed_description</DataField>
           <rd:TypeName>System.String</rd:TypeName>
         </Field>
-        <Field Name="Status">
-          <DataField>Status</DataField>
+        <Field Name="status">
+          <DataField>status</DataField>
           <rd:TypeName>System.String</rd:TypeName>
         </Field>
-        <Field Name="Priority">
-          <DataField>Priority</DataField>
-          <rd:TypeName>System.String</rd:TypeName>
-        </Field>
-        <Field Name="Submitter">
-          <DataField>Submitter</DataField>
+        <Field Name="priority">
+          <DataField>priority</DataField>
           <rd:TypeName>System.String</rd:TypeName>
         </Field>
         <Field Name="Submit_Date">
           <DataField>Submit_Date</DataField>
           <rd:TypeName>System.DateTime</rd:TypeName>
         </Field>
-        <Field Name="ASGRP">
-          <DataField>ASGRP</DataField>
+        <Field Name="asgrp">
+          <DataField>asgrp</DataField>
           <rd:TypeName>System.String</rd:TypeName>
-        </Field>
-        <Field Name="Completed_Date">
-          <DataField>Completed_Date</DataField>
-          <rd:TypeName>System.DateTime</rd:TypeName>
         </Field>
       </Fields>
     </DataSet>
@@ -88,31 +70,25 @@ order by SRM_WOI_WORKORDER.Submit_Date</CommandText>
             <TablixBody>
               <TablixColumns>
                 <TablixColumn>
-                  <Width>36.00666mm</Width>
+                  <Width>36.85333mm</Width>
                 </TablixColumn>
                 <TablixColumn>
-                  <Width>43.62667mm</Width>
+                  <Width>42.56833mm</Width>
                 </TablixColumn>
                 <TablixColumn>
-                  <Width>75mm</Width>
-                </TablixColumn>
-                <TablixColumn>
-                  <Width>25mm</Width>
+                  <Width>62.04167mm</Width>
                 </TablixColumn>
                 <TablixColumn>
                   <Width>25mm</Width>
                 </TablixColumn>
                 <TablixColumn>
-                  <Width>37.27668mm</Width>
+                  <Width>25mm</Width>
                 </TablixColumn>
                 <TablixColumn>
-                  <Width>43.20332mm</Width>
+                  <Width>37.91166mm</Width>
                 </TablixColumn>
                 <TablixColumn>
-                  <Width>67.75665mm</Width>
-                </TablixColumn>
-                <TablixColumn>
-                  <Width>55.26831mm</Width>
+                  <Width>70.29665mm</Width>
                 </TablixColumn>
               </TablixColumns>
               <TablixRows>
@@ -122,7 +98,6 @@ order by SRM_WOI_WORKORDER.Submit_Date</CommandText>
                     <TablixCell>
                       <CellContents>
                         <Textbox Name="Textbox1">
-                          <CanGrow>true</CanGrow>
                           <KeepTogether>true</KeepTogether>
                           <Paragraphs>
                             <Paragraph>
@@ -147,7 +122,6 @@ order by SRM_WOI_WORKORDER.Submit_Date</CommandText>
                               <Style>Solid</Style>
                             </Border>
                             <BackgroundColor>#f86e00</BackgroundColor>
-                            <VerticalAlign>Middle</VerticalAlign>
                             <PaddingLeft>2pt</PaddingLeft>
                             <PaddingRight>2pt</PaddingRight>
                             <PaddingTop>2pt</PaddingTop>
@@ -159,7 +133,6 @@ order by SRM_WOI_WORKORDER.Submit_Date</CommandText>
                     <TablixCell>
                       <CellContents>
                         <Textbox Name="Textbox3">
-                          <CanGrow>true</CanGrow>
                           <KeepTogether>true</KeepTogether>
                           <Paragraphs>
                             <Paragraph>
@@ -184,7 +157,6 @@ order by SRM_WOI_WORKORDER.Submit_Date</CommandText>
                               <Style>Solid</Style>
                             </Border>
                             <BackgroundColor>#f86e00</BackgroundColor>
-                            <VerticalAlign>Middle</VerticalAlign>
                             <PaddingLeft>2pt</PaddingLeft>
                             <PaddingRight>2pt</PaddingRight>
                             <PaddingTop>2pt</PaddingTop>
@@ -196,13 +168,12 @@ order by SRM_WOI_WORKORDER.Submit_Date</CommandText>
                     <TablixCell>
                       <CellContents>
                         <Textbox Name="Textbox5">
-                          <CanGrow>true</CanGrow>
                           <KeepTogether>true</KeepTogether>
                           <Paragraphs>
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value>Detailed Description</Value>
+                                  <Value>Notes</Value>
                                   <Style>
                                     <FontWeight>Bold</FontWeight>
                                     <Color>White</Color>
@@ -221,7 +192,6 @@ order by SRM_WOI_WORKORDER.Submit_Date</CommandText>
                               <Style>Solid</Style>
                             </Border>
                             <BackgroundColor>#f86e00</BackgroundColor>
-                            <VerticalAlign>Middle</VerticalAlign>
                             <PaddingLeft>2pt</PaddingLeft>
                             <PaddingRight>2pt</PaddingRight>
                             <PaddingTop>2pt</PaddingTop>
@@ -233,7 +203,6 @@ order by SRM_WOI_WORKORDER.Submit_Date</CommandText>
                     <TablixCell>
                       <CellContents>
                         <Textbox Name="Textbox7">
-                          <CanGrow>true</CanGrow>
                           <KeepTogether>true</KeepTogether>
                           <Paragraphs>
                             <Paragraph>
@@ -259,7 +228,6 @@ order by SRM_WOI_WORKORDER.Submit_Date</CommandText>
                               <Style>Solid</Style>
                             </Border>
                             <BackgroundColor>#f86e00</BackgroundColor>
-                            <VerticalAlign>Middle</VerticalAlign>
                             <PaddingLeft>2pt</PaddingLeft>
                             <PaddingRight>2pt</PaddingRight>
                             <PaddingTop>2pt</PaddingTop>
@@ -271,7 +239,6 @@ order by SRM_WOI_WORKORDER.Submit_Date</CommandText>
                     <TablixCell>
                       <CellContents>
                         <Textbox Name="Textbox9">
-                          <CanGrow>true</CanGrow>
                           <KeepTogether>true</KeepTogether>
                           <Paragraphs>
                             <Paragraph>
@@ -297,7 +264,6 @@ order by SRM_WOI_WORKORDER.Submit_Date</CommandText>
                               <Style>Solid</Style>
                             </Border>
                             <BackgroundColor>#f86e00</BackgroundColor>
-                            <VerticalAlign>Middle</VerticalAlign>
                             <PaddingLeft>2pt</PaddingLeft>
                             <PaddingRight>2pt</PaddingRight>
                             <PaddingTop>2pt</PaddingTop>
@@ -308,46 +274,7 @@ order by SRM_WOI_WORKORDER.Submit_Date</CommandText>
                     </TablixCell>
                     <TablixCell>
                       <CellContents>
-                        <Textbox Name="Textbox12">
-                          <CanGrow>true</CanGrow>
-                          <KeepTogether>true</KeepTogether>
-                          <Paragraphs>
-                            <Paragraph>
-                              <TextRuns>
-                                <TextRun>
-                                  <Value>Submitter</Value>
-                                  <Style>
-                                    <FontFamily>Arial</FontFamily>
-                                    <FontWeight>Bold</FontWeight>
-                                    <Color>White</Color>
-                                  </Style>
-                                </TextRun>
-                              </TextRuns>
-                              <Style>
-                                <TextAlign>Center</TextAlign>
-                              </Style>
-                            </Paragraph>
-                          </Paragraphs>
-                          <rd:DefaultName>Textbox12</rd:DefaultName>
-                          <Style>
-                            <Border>
-                              <Color>LightGrey</Color>
-                              <Style>Solid</Style>
-                            </Border>
-                            <BackgroundColor>#f86e00</BackgroundColor>
-                            <VerticalAlign>Middle</VerticalAlign>
-                            <PaddingLeft>2pt</PaddingLeft>
-                            <PaddingRight>2pt</PaddingRight>
-                            <PaddingTop>2pt</PaddingTop>
-                            <PaddingBottom>2pt</PaddingBottom>
-                          </Style>
-                        </Textbox>
-                      </CellContents>
-                    </TablixCell>
-                    <TablixCell>
-                      <CellContents>
-                        <Textbox Name="Textbox14">
-                          <CanGrow>true</CanGrow>
+                        <Textbox Name="Textbox11">
                           <KeepTogether>true</KeepTogether>
                           <Paragraphs>
                             <Paragraph>
@@ -366,14 +293,13 @@ order by SRM_WOI_WORKORDER.Submit_Date</CommandText>
                               </Style>
                             </Paragraph>
                           </Paragraphs>
-                          <rd:DefaultName>Textbox14</rd:DefaultName>
+                          <rd:DefaultName>Textbox11</rd:DefaultName>
                           <Style>
                             <Border>
                               <Color>LightGrey</Color>
                               <Style>Solid</Style>
                             </Border>
                             <BackgroundColor>#f86e00</BackgroundColor>
-                            <VerticalAlign>Middle</VerticalAlign>
                             <PaddingLeft>2pt</PaddingLeft>
                             <PaddingRight>2pt</PaddingRight>
                             <PaddingTop>2pt</PaddingTop>
@@ -384,14 +310,14 @@ order by SRM_WOI_WORKORDER.Submit_Date</CommandText>
                     </TablixCell>
                     <TablixCell>
                       <CellContents>
-                        <Textbox Name="Textbox16">
-                          <CanGrow>true</CanGrow>
+                        <Textbox Name="Textbox13">
                           <KeepTogether>true</KeepTogether>
                           <Paragraphs>
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value>Request Assignee Support Group</Value>
+                                  <Value>Request Assignee Support Group
+</Value>
                                   <Style>
                                     <FontFamily>Arial</FontFamily>
                                     <FontWeight>Bold</FontWeight>
@@ -404,52 +330,13 @@ order by SRM_WOI_WORKORDER.Submit_Date</CommandText>
                               </Style>
                             </Paragraph>
                           </Paragraphs>
-                          <rd:DefaultName>Textbox16</rd:DefaultName>
+                          <rd:DefaultName>Textbox13</rd:DefaultName>
                           <Style>
                             <Border>
                               <Color>LightGrey</Color>
                               <Style>Solid</Style>
                             </Border>
                             <BackgroundColor>#f86e00</BackgroundColor>
-                            <VerticalAlign>Middle</VerticalAlign>
-                            <PaddingLeft>2pt</PaddingLeft>
-                            <PaddingRight>2pt</PaddingRight>
-                            <PaddingTop>2pt</PaddingTop>
-                            <PaddingBottom>2pt</PaddingBottom>
-                          </Style>
-                        </Textbox>
-                      </CellContents>
-                    </TablixCell>
-                    <TablixCell>
-                      <CellContents>
-                        <Textbox Name="Textbox18">
-                          <CanGrow>true</CanGrow>
-                          <KeepTogether>true</KeepTogether>
-                          <Paragraphs>
-                            <Paragraph>
-                              <TextRuns>
-                                <TextRun>
-                                  <Value>Work Order Completed Date</Value>
-                                  <Style>
-                                    <FontFamily>Arial</FontFamily>
-                                    <FontWeight>Bold</FontWeight>
-                                    <Color>White</Color>
-                                  </Style>
-                                </TextRun>
-                              </TextRuns>
-                              <Style>
-                                <TextAlign>Center</TextAlign>
-                              </Style>
-                            </Paragraph>
-                          </Paragraphs>
-                          <rd:DefaultName>Textbox18</rd:DefaultName>
-                          <Style>
-                            <Border>
-                              <Color>LightGrey</Color>
-                              <Style>Solid</Style>
-                            </Border>
-                            <BackgroundColor>#f86e00</BackgroundColor>
-                            <VerticalAlign>Middle</VerticalAlign>
                             <PaddingLeft>2pt</PaddingLeft>
                             <PaddingRight>2pt</PaddingRight>
                             <PaddingTop>2pt</PaddingTop>
@@ -465,22 +352,20 @@ order by SRM_WOI_WORKORDER.Submit_Date</CommandText>
                   <TablixCells>
                     <TablixCell>
                       <CellContents>
-                        <Textbox Name="Work_Order_ID">
+                        <Textbox Name="work_order_id">
                           <KeepTogether>true</KeepTogether>
                           <Paragraphs>
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value>=Fields!Work_Order_ID.Value</Value>
+                                  <Value>=Fields!work_order_id.Value</Value>
                                   <Style />
                                 </TextRun>
                               </TextRuns>
-                              <Style>
-                                <TextAlign>Left</TextAlign>
-                              </Style>
+                              <Style />
                             </Paragraph>
                           </Paragraphs>
-                          <rd:DefaultName>Work_Order_ID</rd:DefaultName>
+                          <rd:DefaultName>work_order_id</rd:DefaultName>
                           <Style>
                             <Border>
                               <Color>LightGrey</Color>
@@ -497,22 +382,20 @@ order by SRM_WOI_WORKORDER.Submit_Date</CommandText>
                     </TablixCell>
                     <TablixCell>
                       <CellContents>
-                        <Textbox Name="Summary">
+                        <Textbox Name="summary">
                           <KeepTogether>true</KeepTogether>
                           <Paragraphs>
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value>=Fields!Summary.Value</Value>
+                                  <Value>=Fields!summary.Value</Value>
                                   <Style />
                                 </TextRun>
                               </TextRuns>
-                              <Style>
-                                <TextAlign>Left</TextAlign>
-                              </Style>
+                              <Style />
                             </Paragraph>
                           </Paragraphs>
-                          <rd:DefaultName>Summary</rd:DefaultName>
+                          <rd:DefaultName>summary</rd:DefaultName>
                           <Style>
                             <Border>
                               <Color>LightGrey</Color>
@@ -529,22 +412,20 @@ order by SRM_WOI_WORKORDER.Submit_Date</CommandText>
                     </TablixCell>
                     <TablixCell>
                       <CellContents>
-                        <Textbox Name="Detailed_Description">
+                        <Textbox Name="detailed_description">
                           <KeepTogether>true</KeepTogether>
                           <Paragraphs>
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value>=Fields!Detailed_Description.Value</Value>
+                                  <Value>=Fields!detailed_description.Value</Value>
                                   <Style />
                                 </TextRun>
                               </TextRuns>
-                              <Style>
-                                <TextAlign>Left</TextAlign>
-                              </Style>
+                              <Style />
                             </Paragraph>
                           </Paragraphs>
-                          <rd:DefaultName>Detailed_Description</rd:DefaultName>
+                          <rd:DefaultName>detailed_description</rd:DefaultName>
                           <Style>
                             <Border>
                               <Color>LightGrey</Color>
@@ -561,24 +442,22 @@ order by SRM_WOI_WORKORDER.Submit_Date</CommandText>
                     </TablixCell>
                     <TablixCell>
                       <CellContents>
-                        <Textbox Name="Status">
+                        <Textbox Name="status">
                           <KeepTogether>true</KeepTogether>
                           <Paragraphs>
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value>=Fields!Status.Value</Value>
+                                  <Value>=Fields!status.Value</Value>
                                   <Style>
                                     <FontFamily>Arial</FontFamily>
                                   </Style>
                                 </TextRun>
                               </TextRuns>
-                              <Style>
-                                <TextAlign>Left</TextAlign>
-                              </Style>
+                              <Style />
                             </Paragraph>
                           </Paragraphs>
-                          <rd:DefaultName>Status</rd:DefaultName>
+                          <rd:DefaultName>status</rd:DefaultName>
                           <Style>
                             <Border>
                               <Color>LightGrey</Color>
@@ -595,58 +474,22 @@ order by SRM_WOI_WORKORDER.Submit_Date</CommandText>
                     </TablixCell>
                     <TablixCell>
                       <CellContents>
-                        <Textbox Name="Priority">
+                        <Textbox Name="priority">
                           <KeepTogether>true</KeepTogether>
                           <Paragraphs>
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value>=Fields!Priority.Value</Value>
+                                  <Value>=Fields!priority.Value</Value>
                                   <Style>
                                     <FontFamily>Arial</FontFamily>
                                   </Style>
                                 </TextRun>
                               </TextRuns>
-                              <Style>
-                                <TextAlign>Left</TextAlign>
-                              </Style>
+                              <Style />
                             </Paragraph>
                           </Paragraphs>
-                          <rd:DefaultName>Priority</rd:DefaultName>
-                          <Style>
-                            <Border>
-                              <Color>LightGrey</Color>
-                              <Style>Solid</Style>
-                            </Border>
-                            <BackgroundColor>=IIF(ROWNUMBER(NOTHING) MOD 2, "#FBE4D6", "Transparent")</BackgroundColor>
-                            <PaddingLeft>2pt</PaddingLeft>
-                            <PaddingRight>2pt</PaddingRight>
-                            <PaddingTop>2pt</PaddingTop>
-                            <PaddingBottom>2pt</PaddingBottom>
-                          </Style>
-                        </Textbox>
-                      </CellContents>
-                    </TablixCell>
-                    <TablixCell>
-                      <CellContents>
-                        <Textbox Name="Submitter">
-                          <KeepTogether>true</KeepTogether>
-                          <Paragraphs>
-                            <Paragraph>
-                              <TextRuns>
-                                <TextRun>
-                                  <Value>=Fields!Submitter.Value</Value>
-                                  <Style>
-                                    <FontFamily>Arial</FontFamily>
-                                  </Style>
-                                </TextRun>
-                              </TextRuns>
-                              <Style>
-                                <TextAlign>Left</TextAlign>
-                              </Style>
-                            </Paragraph>
-                          </Paragraphs>
-                          <rd:DefaultName>Submitter</rd:DefaultName>
+                          <rd:DefaultName>priority</rd:DefaultName>
                           <Style>
                             <Border>
                               <Color>LightGrey</Color>
@@ -676,9 +519,7 @@ order by SRM_WOI_WORKORDER.Submit_Date</CommandText>
                                   </Style>
                                 </TextRun>
                               </TextRuns>
-                              <Style>
-                                <TextAlign>Left</TextAlign>
-                              </Style>
+                              <Style />
                             </Paragraph>
                           </Paragraphs>
                           <rd:DefaultName>Submit_Date</rd:DefaultName>
@@ -698,59 +539,22 @@ order by SRM_WOI_WORKORDER.Submit_Date</CommandText>
                     </TablixCell>
                     <TablixCell>
                       <CellContents>
-                        <Textbox Name="ASGRP">
+                        <Textbox Name="asgrp">
                           <KeepTogether>true</KeepTogether>
                           <Paragraphs>
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value>=Fields!ASGRP.Value</Value>
+                                  <Value>=Fields!asgrp.Value</Value>
                                   <Style>
                                     <FontFamily>Arial</FontFamily>
                                   </Style>
                                 </TextRun>
                               </TextRuns>
-                              <Style>
-                                <TextAlign>Left</TextAlign>
-                              </Style>
+                              <Style />
                             </Paragraph>
                           </Paragraphs>
-                          <rd:DefaultName>ASGRP</rd:DefaultName>
-                          <Style>
-                            <Border>
-                              <Color>LightGrey</Color>
-                              <Style>Solid</Style>
-                            </Border>
-                            <BackgroundColor>=IIF(ROWNUMBER(NOTHING) MOD 2, "#FBE4D6", "Transparent")</BackgroundColor>
-                            <PaddingLeft>2pt</PaddingLeft>
-                            <PaddingRight>2pt</PaddingRight>
-                            <PaddingTop>2pt</PaddingTop>
-                            <PaddingBottom>2pt</PaddingBottom>
-                          </Style>
-                        </Textbox>
-                      </CellContents>
-                    </TablixCell>
-                    <TablixCell>
-                      <CellContents>
-                        <Textbox Name="Completed_Date">
-                          <KeepTogether>true</KeepTogether>
-                          <Paragraphs>
-                            <Paragraph>
-                              <TextRuns>
-                                <TextRun>
-                                  <Value>=Fields!Completed_Date.Value</Value>
-                                  <Style>
-                                    <FontFamily>Arial</FontFamily>
-                                    <Format>dd/MM/yyyy HH:mm</Format>
-                                  </Style>
-                                </TextRun>
-                              </TextRuns>
-                              <Style>
-                                <TextAlign>Left</TextAlign>
-                              </Style>
-                            </Paragraph>
-                          </Paragraphs>
-                          <rd:DefaultName>Completed_Date</rd:DefaultName>
+                          <rd:DefaultName>asgrp</rd:DefaultName>
                           <Style>
                             <Border>
                               <Color>LightGrey</Color>
@@ -778,8 +582,6 @@ order by SRM_WOI_WORKORDER.Submit_Date</CommandText>
                 <TablixMember />
                 <TablixMember />
                 <TablixMember />
-                <TablixMember />
-                <TablixMember />
               </TablixMembers>
             </TablixColumnHierarchy>
             <TablixRowHierarchy>
@@ -793,11 +595,11 @@ order by SRM_WOI_WORKORDER.Submit_Date</CommandText>
               </TablixMembers>
             </TablixRowHierarchy>
             <DataSetName>a1telekom_prd_ar</DataSetName>
-            <PageName>WO GRC - SOX</PageName>
+            <PageName>Slavko Vranjkovic - WO</PageName>
             <Top>0mm</Top>
             <Left>0mm</Left>
             <Height>12mm</Height>
-            <Width>408.1383mm</Width>
+            <Width>299.67164mm</Width>
             <Style>
               <Border>
                 <Style>None</Style>
@@ -812,7 +614,7 @@ order by SRM_WOI_WORKORDER.Submit_Date</CommandText>
           </Border>
         </Style>
       </Body>
-      <Width>408.1383mm</Width>
+      <Width>300.095mm</Width>
       <Page>
         <PageFooter>
           <Height>11.43mm</Height>
@@ -824,12 +626,12 @@ order by SRM_WOI_WORKORDER.Submit_Date</CommandText>
             </Border>
           </Style>
         </PageFooter>
-        <PageHeight>29.7cm</PageHeight>
-        <PageWidth>21cm</PageWidth>
-        <LeftMargin>2cm</LeftMargin>
-        <RightMargin>2cm</RightMargin>
-        <TopMargin>2cm</TopMargin>
-        <BottomMargin>2cm</BottomMargin>
+        <PageHeight>297mm</PageHeight>
+        <PageWidth>210mm</PageWidth>
+        <LeftMargin>20mm</LeftMargin>
+        <RightMargin>20mm</RightMargin>
+        <TopMargin>20mm</TopMargin>
+        <BottomMargin>20mm</BottomMargin>
         <ColumnSpacing>0.13cm</ColumnSpacing>
         <Style />
       </Page>
@@ -843,5 +645,5 @@ order by SRM_WOI_WORKORDER.Submit_Date</CommandText>
   </ReportParametersLayout>
   <rd:ReportUnitType>Mm</rd:ReportUnitType>
   <rd:ReportServerUrl>http://10.250.235.177/ReportServer</rd:ReportServerUrl>
-  <rd:ReportID>60abe7d2-a695-4980-9275-6429b86c80c5</rd:ReportID>
+  <rd:ReportID>283712f5-11ee-4346-b545-a79226317b2d</rd:ReportID>
 </Report>
